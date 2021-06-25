@@ -1,17 +1,19 @@
 #include <Arduino.h>
 #include <ModbusRTU.h>
+#include <BluetoothSerial.h>
+#include "sensors.h"
+
+#include "config.h"
 
 const int SENSOR_IREG = 0;
 const int RELAY_OFFSET = 0;
 ModbusRTU modbusRTU;
 const int SLAVE_ID = 1;
 
-#define IR_TRIGGER 13
-#define IR_DATA 36
-#define RELAY 23
-#define LED 2
+Sensors sensors;
 
-//const int pin = 5;
+BluetoothSerial btSerial;
+
 
 uint16_t cbRelay(TRegister* reg, uint16_t val) {
   digitalWrite(RELAY, COIL_BOOL(val));
@@ -20,10 +22,9 @@ uint16_t cbRelay(TRegister* reg, uint16_t val) {
 
 void setup() {
   Serial.begin(9600, SERIAL_8N1);
-  pinMode(IR_TRIGGER, OUTPUT);
-  pinMode(IR_DATA, INPUT);
+  btSerial.begin("Escape-game");
+  sensors.begin();
   pinMode(RELAY, OUTPUT);
-  pinMode(LED, OUTPUT);
 
   modbusRTU.begin(&Serial);
   modbusRTU.slave(SLAVE_ID);
@@ -35,17 +36,21 @@ void setup() {
 
 void loop() {
   modbusRTU.task();
+  uint16_t sensorsData[8];
+
+  for(int i = 0; i < 8; i++)
+    sensorsData[i] = sensors.read(i);
+    
+  for(int i = 0; i < 8; i++) 
+    btSerial.printf("%d ", sensorsData[i]);
+  btSerial.println();
+
+  digitalWrite(RELAY, (millis() % 10000) < 5000);
+
   
-  digitalWrite(IR_TRIGGER, LOW);
-  delayMicroseconds(200);
-  int v1 = analogRead(IR_DATA);    // Mesure de la lumière infrarouge ambiante (capteur éteint)
-  digitalWrite(IR_TRIGGER, HIGH);
-  delayMicroseconds(200);
-  int v2 = analogRead(IR_DATA);    // Mesure de la lumière réfléchie avec le capteur allumé
-  int ir_val = abs(v2 - v1);
-  modbusRTU.Ireg(SENSOR_IREG, ir_val);
-  digitalWrite(IR_TRIGGER, LOW);
+
+  //modbusRTU.Ireg(SENSOR_IREG, val);
 
 
-  delay(10);
+  //delay(500);
 }
