@@ -36,22 +36,39 @@ void DualModbusClass::addInputRegister(InputRegister *ireg)
     registers.insert(ireg);
 }
 
+void DualModbusClass::addDiscreteInput(DiscreteInput *di)
+{
+    modbusRTU.addIsts(di->get_offset());
+    registers.insert(di);
+}
+
 DualModbusClass Modbus;
 
-Register::Register(unsigned int offset) : offset(offset) {}
-unsigned int Register::get_offset() const
+Register::Register(uint16_t offset) : offset(offset) {}
+uint16_t Register::get_offset() const
 {
     return offset;
 }
 
-Coil::Coil(unsigned int offset) : Register(offset) { Modbus.addCoil(this); }
+Coil::Coil(uint16_t offset) : Register(offset) { Modbus.addCoil(this); }
 void Coil::task() {}
 
-InputRegister::InputRegister(unsigned int offset) : Register(offset) {
+InputRegister::InputRegister(uint16_t offset) : Register(offset) 
+{
     Modbus.addInputRegister(this);
 }
 
 void InputRegister::setValue(uint16_t val)
 {
     Modbus.modbusRTU.Ireg(get_offset(), val);
+}
+
+DiscreteInput::DiscreteInput(uint16_t offset) : Register(offset)
+{
+    Modbus.addDiscreteInput(this);
+}
+
+void DiscreteInput::setValue(bool val)
+{
+    Modbus.modbusRTU.Ists(get_offset(), val);
 }

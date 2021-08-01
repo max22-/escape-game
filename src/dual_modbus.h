@@ -10,27 +10,33 @@
 
 class Register {
 public:
-    Register(unsigned int offset);
-    unsigned int get_offset() const;
+    Register(uint16_t offset);
+    uint16_t get_offset() const;
     virtual void task() = 0;
 
 private:
-    const unsigned int offset;
+    const uint16_t offset;
 };
 
 class Coil : public Register {
 public:
-    Coil(unsigned int offset);
+    Coil(uint16_t offset);
     virtual void on_set(bool val) = 0;
     void task() override;
 };
 
 class InputRegister : public Register {
 public:
-    InputRegister(unsigned int offset);
-    virtual void task() = 0;
+    InputRegister(uint16_t offset);
 protected:
     void setValue(uint16_t val);
+};
+
+class DiscreteInput : public Register {
+public:
+    DiscreteInput(uint16_t offset);
+protected:
+    void setValue(bool val);
 };
 
 class DualModbusClass {
@@ -50,9 +56,11 @@ private:
 
     void addCoil(Coil*);
     void addInputRegister(InputRegister*);
+    void addDiscreteInput(DiscreteInput *);
     friend class Register;
     friend class Coil;
     friend class InputRegister;
+    friend class DiscreteInput;
 };
 
 extern DualModbusClass Modbus;
