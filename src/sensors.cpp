@@ -1,10 +1,6 @@
 #include "sensors.h"
 #include "config.h"
 
-#include <BluetoothSerial.h>
-
-extern BluetoothSerial btSerial;
-
 void Sensors::begin()
 {
     pinMode(SENSORS_TRIGGER, OUTPUT);
@@ -31,5 +27,6 @@ uint16_t Sensors::read(uint8_t sensorNumber)
     delayMicroseconds(sensorsDelay);
     int v2 = analogRead(SENSORS_DATA);    // Mesure de la lumière réfléchie avec le capteur allumé
     digitalWrite(SENSORS_TRIGGER, LOW);
+    //Serial.printf("sensor %d : ambient %d, lit %d, return %d\n", sensorNumber, v1, v2, abs(v2-v1));
     return abs(v2 - v1);
 }
