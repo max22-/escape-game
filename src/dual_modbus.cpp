@@ -24,10 +24,6 @@ void DualModbusClass::addCoil(Coil* coil)
 
     modbusRTU.addCoil(offset);
     modbusRTU.onSetCoil(offset, callback);
-    #if defined(USE_WIFI)
-    modbusIP.addCoil(coil->get_offset());
-    modbusIP.onSetCoil(offset, callback);
-    #endif
 }
 
 DualModbusClass Modbus;
