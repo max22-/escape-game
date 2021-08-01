@@ -1,18 +1,20 @@
-#include "sensors.h"
+#include "sensor.h"
 #include "config.h"
 
-void Sensors::begin()
+Sensor::Sensor(uint16_t offset, uint8_t sensorNumber) : InputRegister(offset), sensorNumber(sensorNumber)
 {
-    pinMode(SENSORS_TRIGGER, OUTPUT);
-    pinMode(SENSORS_DATA, INPUT);
-    pinMode(S0, OUTPUT);
-    pinMode(S1, OUTPUT);
-    pinMode(S2, OUTPUT);
+    if(!isInit) {
+        pinMode(SENSORS_TRIGGER, OUTPUT);
+        pinMode(SENSORS_DATA, INPUT);
+        pinMode(S0, OUTPUT);
+        pinMode(S1, OUTPUT);
+        pinMode(S2, OUTPUT);
+        isInit = true;
+    }
 }
 
-uint16_t Sensors::read(uint8_t sensorNumber)
+void Sensor::task()
 {
-    const int sensorsDelay = 200;
     const uint8_t s0 = sensorNumber & 1 ? HIGH : LOW;
     const uint8_t s1 = sensorNumber & 2 ? HIGH : LOW;
     const uint8_t s2 = sensorNumber & 4 ? HIGH : LOW;
@@ -21,12 +23,14 @@ uint16_t Sensors::read(uint8_t sensorNumber)
     digitalWrite(S2, s2);
 
     digitalWrite(SENSORS_TRIGGER, LOW);
-    delayMicroseconds(sensorsDelay);
+    delayMicroseconds(SENSORS_DELAY);
     int v1 = analogRead(SENSORS_DATA);    // Mesure de la lumière infrarouge ambiante (capteur éteint)
     digitalWrite(SENSORS_TRIGGER, HIGH);
-    delayMicroseconds(sensorsDelay);
+    delayMicroseconds(SENSORS_DELAY);
     int v2 = analogRead(SENSORS_DATA);    // Mesure de la lumière réfléchie avec le capteur allumé
     digitalWrite(SENSORS_TRIGGER, LOW);
     //Serial.printf("sensor %d : ambient %d, lit %d, return %d\n", sensorNumber, v1, v2, abs(v2-v1));
-    return abs(v2 - v1);
+    setValue(abs(v2 - v1));
 }
+
+bool Sensor::isInit = false;

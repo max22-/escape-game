@@ -1,4 +1,5 @@
 #include "dual_modbus.h"
+#include "debug.h"
 
 void DualModbusClass::begin()
 {
@@ -15,6 +16,8 @@ void DualModbusClass::task()
     #if defined(USE_WIFI)
     modbusIP.task();
     #endif
+    for(Register* r: registers)
+        r->task();
 }
 
 void DualModbusClass::addCoil(Coil* coil)
@@ -26,6 +29,13 @@ void DualModbusClass::addCoil(Coil* coil)
     modbusRTU.onSetCoil(offset, callback);
 }
 
+
+void DualModbusClass::addInputRegister(InputRegister *ireg)
+{
+    modbusRTU.addIreg(ireg->get_offset());
+    registers.insert(ireg);
+}
+
 DualModbusClass Modbus;
 
 Register::Register(unsigned int offset) : offset(offset) {}
@@ -35,5 +45,13 @@ unsigned int Register::get_offset() const
 }
 
 Coil::Coil(unsigned int offset) : Register(offset) { Modbus.addCoil(this); }
+void Coil::task() {}
 
-InputRegister::InputRegister(unsigned int offset) : Register(offset) {}
+InputRegister::InputRegister(unsigned int offset) : Register(offset) {
+    Modbus.addInputRegister(this);
+}
+
+void InputRegister::setValue(uint16_t val)
+{
+    Modbus.modbusRTU.Ireg(get_offset(), val);
+}

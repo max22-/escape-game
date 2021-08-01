@@ -24,5 +24,8 @@
 #define S1 33
 #define S2 27
 
+// Optical sensors
+#define SENSORS_DELAY 200   // microseconds
+
 
 #endif
