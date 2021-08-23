@@ -24,6 +24,13 @@
 #define S1 33
 #define S2 27
 
+#define IO0 19
+#define IO1 18
+#define IO2 5
+#define IO3 17
+#define IO4 16
+#define IO5 4
+
 // Optical sensors
 #define SENSORS_DELAY 20   // microseconds
 
