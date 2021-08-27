@@ -1,34 +1,45 @@
 #if defined(ROOM1)
 
-#include "../devices/devices.h"
+#include "rooms.h"
+#include "sensor.h"
+#include "config.h"
+#include "light.h"
 
-void light_profile(Light *light)
+#define BUTTON_PIN 23
+
+static void light_task(void* params)
 {
-    light->set_level(0);
-    light->ramp(1, 5000);
+    light_set_level(0);
+    light_ramp(1, 10000);
+    while(true)
+        delay(1000);
 }
 
-void init_room()
+void room_init()
 {
-    new Relay(0, 19);
-    new Light(1, 25, 0, light_profile);
-    //new Restart(3);
+    pinMode(IO0, OUTPUT);
+    digitalWrite(IO0, LOW);
+    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    sensors_init();
+    light_begin(light_task);
+}
 
-    new Sensor(0, 0);
-    new Sensor(1, 1);
-    new Sensor(2, 2);
-    new Sensor(3, 3);
-    new Sensor(4, 4);
-    new Sensor(5, 5);
-    new Sensor(6, 6);
+void room_receive(profilab_data_t data)
+{
+    printf("channel = %d, n = %lf\n", data.channel, data.n);
+    digitalWrite(IO0, (((int)data.n) & 1) == 1 ? HIGH : LOW);
+    if(((int)data.n) & 2) light_trigger();
+}
 
-    new Button(0, 23);
-    new Button(1, 35);
-    new Button(2, 34);
-    new Button(3, 39);
-
+profilab_data_t room_send()
+{
+    profilab_data_t data = {0, 0.1};
+    for(int i = 0; i < 8; i++)
+        data.n += (sensor_read(i) > SENSORS_THRESHOLD) << i;
     
-
+    if(digitalRead(BUTTON_PIN) == HIGH)
+        data.n += 1 << 8;
+    return data;
 }
 
 #endif
