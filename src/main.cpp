@@ -2,21 +2,24 @@
 #include "config.h"
 #include "wifi_config.h"
 #include <WiFi.h>
+#ifdef USE_OTA
+#include <ArduinoOTA.h>
+#endif
 #include "rooms/rooms.h"
 #include "profilab.h"
 
 WiFiServer wifiServer(30000);
 
 #if defined(SALLE_ETE)
-  IPAddress local_IP(192, 168, 1, 101);
+  IPAddress local_IP(192, 168, 1, 210);
 #elif defined(SALLE_AUTOMNE)
-  IPAddress local_IP(192, 168, 1, 102);
+  IPAddress local_IP(192, 168, 1, 220);
 #elif defined(SALLE_HIVER)
-  IPAddress local_IP(192, 168, 1, 103);
+  IPAddress local_IP(192, 168, 1, 230);
 #elif defined(SALLE_PRINTEMPS)
-  IPAddress local_IP(192, 168, 1, 104);
+  IPAddress local_IP(192, 168, 1, 240);
 #elif defined(SALLE_CENTRALE)
-  IPAddress local_IP(192, 168, 1, 105);
+  IPAddress local_IP(192, 168, 1, 250);
 #endif
 
 IPAddress gateway(192, 168, 1, 1);
@@ -39,11 +42,17 @@ void setup() {
     Serial.print(".");
   }
   Serial.printf("\nIP : %s\n", WiFi.localIP().toString().c_str());
+  #ifdef USE_OTA
+  ArduinoOTA.begin();
+  #endif
   wifiServer.begin();
   room_init();
 }
 
 void loop() {
+  #ifdef USE_OTA
+  ArduinoOTA.handle();
+  #endif
   uint8_t buffer[12];
   WiFiClient client = wifiServer.available();
   if(client) {

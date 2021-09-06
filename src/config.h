@@ -1,6 +1,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define USE_OTA
 
 // Pins
 #define SENSORS_TRIGGER 2
