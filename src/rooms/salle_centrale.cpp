@@ -1,4 +1,4 @@
-#if defined(ROOM5)
+#if defined(SALLE_CENTRALE)
 
 void init_room()
 {

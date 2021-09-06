@@ -1,4 +1,4 @@
-#if defined(ROOM1)
+#if defined(SALLE_ETE)
 
 #include "rooms.h"
 #include "sensor.h"
