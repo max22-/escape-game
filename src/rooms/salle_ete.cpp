@@ -5,7 +5,10 @@
 #include "config.h"
 #include "light.h"
 
-#define BUTTON_PIN 23
+const uint8_t buttons[] = {23, 35, 34, 39};
+/* LIGHT = 25 (in config.h) */
+const uint8_t black_light = 26;
+const uint8_t relay = IO0;
 
 static void light_task(void* params)
 {
@@ -17,9 +20,11 @@ static void light_task(void* params)
 
 void room_init()
 {
-    pinMode(IO0, OUTPUT);
-    digitalWrite(IO0, LOW);
-    pinMode(BUTTON_PIN, INPUT_PULLUP);
+    for(int i = 0; i < sizeof(buttons); i++)
+        pinMode(buttons[i], INPUT_PULLUP);
+    pinMode(black_light, OUTPUT);
+    pinMode(relay, OUTPUT);
+    digitalWrite(relay, LOW);
     sensors_init();
     light_begin(light_task);
 }
@@ -27,18 +32,28 @@ void room_init()
 void room_receive(profilab_data_t data)
 {
     printf("channel = %d, n = %lf\n", data.channel, data.n);
-    digitalWrite(IO0, (((int)data.n) & 1) == 1 ? HIGH : LOW);
-    if(((int)data.n) & 2) light_trigger();
+    uint8_t channel = data.channel;
+    int ni = (int)data.n;
+
+    if(channel == 0) {
+        if(ni & (1 << 0)) digitalWrite(relay, HIGH); else digitalWrite(relay, LOW);
+        if(ni & (1 << 1)) digitalWrite(black_light, HIGH); else digitalWrite(black_light, LOW);
+        if(ni & (1 << 2)) light_trigger();
+    }
 }
 
 profilab_data_t room_send()
 {
     profilab_data_t data = {0, 0.1};
-    for(int i = 0; i < 8; i++)
+    
+    for(int i = 0; i < 7; i++)
         data.n += (sensor_read(i) > SENSORS_THRESHOLD) << i;
     
-    if(digitalRead(BUTTON_PIN) == HIGH)
-        data.n += 1 << 8;
+    for(int i = 0; i < sizeof(buttons); i++) {
+        if(digitalRead(buttons[i]) == LOW)
+            data.n += 1 << (7 + i);
+    }
+
     return data;
 }
 
