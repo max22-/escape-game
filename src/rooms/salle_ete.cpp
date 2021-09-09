@@ -36,9 +36,9 @@ void room_receive(profilab_data_t data)
     int ni = (int)data.n;
 
     if(channel == 0) {
-        if(ni & (1 << 0)) digitalWrite(relay, HIGH); else digitalWrite(relay, LOW);
-        if(ni & (1 << 1)) digitalWrite(black_light, HIGH); else digitalWrite(black_light, LOW);
-        if(ni & (1 << 2)) light_trigger();
+        if(ni & (1 << 7)) digitalWrite(relay, HIGH); else digitalWrite(relay, LOW);
+        if(ni & (1 << 8)) digitalWrite(black_light, HIGH); else digitalWrite(black_light, LOW);
+        if(ni & (1 << 9)) light_trigger();
     }
 }
 
@@ -51,7 +51,7 @@ profilab_data_t room_send()
     
     for(int i = 0; i < sizeof(buttons); i++) {
         if(digitalRead(buttons[i]) == LOW)
-            data.n += 1 << (7 + i);
+            data.n += 1 << (10 + i);
     }
 
     return data;
