@@ -68,8 +68,14 @@ void loop() {
       if(old_data.n != data.n || old_data.channel != data.channel) {
         profilab_encode(data, &buffer);
         client.write(buffer, sizeof(buffer));
-        printf("old_data = {%d, %lf}\t data = {%d, %lf}\n", old_data.channel, old_data.n, data.channel, data.n);
-        printf("sending %lf on channel %d\n", data.n, data.channel);
+        uint32_t ni = data.n;
+        for(int i = 0; i < 16; i++)
+          printf("%2d  ", i);
+        printf("\n");
+        for(int i = 0; i < 16; i++)
+            printf(" %d  ", (ni & (1 << i)) > 0);
+        //printf("\t{channel=%d, n=%f}"", data.channel, data.n);
+        printf("\n\n");
         old_data = data;
       }
       delay(10);
