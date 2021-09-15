@@ -13,7 +13,7 @@ WiFiServer wifiServer(30000);
 #if defined(SALLE_ETE)
   IPAddress local_IP(192, 168, 0, 210);
 #elif defined(SALLE_AUTOMNE)
-  IPAddress local_IP(192, 168, 0, 220);
+  IPAddress local_IP(192, 168, 0, 202);
 #elif defined(SALLE_HIVER)
   IPAddress local_IP(192, 168, 0, 230);
 #elif defined(SALLE_PRINTEMPS)
