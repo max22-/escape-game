@@ -18,7 +18,7 @@ static void light_task(void* params)
         delay(1000);
 }
 
-void room_init()
+void room_init(ProfilabTCP& profilabTCP)
 {
     for(int i = 0; i < sizeof(buttons); i++)
         pinMode(buttons[i], INPUT_PULLUP);
@@ -27,34 +27,24 @@ void room_init()
     digitalWrite(relay, LOW);
     sensors_init();
     light_begin(light_task);
+    profilabTCP.rx(7, [](bool val) {
+        digitalWrite(relay, val ? HIGH : LOW);
+    });
+    profilabTCP.rx(8, [](bool val) {
+        digitalWrite(relay, black_light ? HIGH : LOW);
+    });
+    profilabTCP.rx(9, [](bool val) {
+        light_trigger();
+    });
 }
 
-void room_receive(profilab_data_t data)
+void room_handle(ProfilabTCP& profilabTCP)
 {
-    printf("channel = %d, n = %lf\n", data.channel, data.n);
-    uint8_t channel = data.channel;
-    int ni = (int)data.n;
-
-    if(channel == 0) {
-        if(ni & (1 << 7)) digitalWrite(relay, HIGH); else digitalWrite(relay, LOW);
-        if(ni & (1 << 8)) digitalWrite(black_light, HIGH); else digitalWrite(black_light, LOW);
-        if(ni & (1 << 9)) light_trigger();
-    }
-}
-
-profilab_data_t room_send()
-{
-    profilab_data_t data = {0, 0.1};
-    
     for(int i = 0; i < 7; i++)
-        data.n += (sensor_read(i) > SENSORS_THRESHOLD) << i;
+        profilabTCP.tx(i, sensor_read(i) > SENSORS_THRESHOLD);
     
-    for(int i = 0; i < sizeof(buttons); i++) {
-        if(digitalRead(buttons[i]) == LOW)
-            data.n += 1 << (10 + i);
-    }
-
-    return data;
+    for(int i = 0; i < sizeof(buttons); i++)
+        profilabTCP.tx(10+i, digitalRead(buttons[i]) == LOW);
 }
 
 #endif

@@ -6,9 +6,9 @@
 #include <ArduinoOTA.h>
 #endif
 #include "rooms/rooms.h"
-#include "profilab.h"
+#include "profilab_tcp.h"
 
-WiFiServer wifiServer(30000);
+ProfilabTCP profilabTCP(30000);
 
 #if defined(SALLE_ETE)
   IPAddress local_IP(192, 168, 0, 210);
@@ -45,43 +45,16 @@ void setup() {
   #ifdef USE_OTA
   ArduinoOTA.begin();
   #endif
-  wifiServer.begin();
-  room_init();
+  profilabTCP.begin();
+  room_init(profilabTCP);
 }
 
 void loop() {
   #ifdef USE_OTA
   ArduinoOTA.handle();
   #endif
-  uint8_t buffer[12];
-  WiFiClient client = wifiServer.available();
-  if(client) {
-    printf("Client connected : %s\n", client.remoteIP().toString().c_str());
-    while(client.connected()) {
-      while(client.available() >= 12) {
-        client.readBytes(buffer, sizeof(buffer));
-        profilab_data_t data = profilab_decode(buffer);
-        room_receive(data);
-      }
-      static profilab_data_t old_data = {0, 0};
-      profilab_data_t data = room_send();
-      if(old_data.n != data.n || old_data.channel != data.channel) {
-        profilab_encode(data, &buffer);
-        client.write(buffer, sizeof(buffer));
-        uint32_t ni = data.n;
-        for(int i = 0; i < 16; i++)
-          printf("%2d  ", i);
-        printf("\n");
-        for(int i = 0; i < 16; i++)
-            printf(" %d  ", (ni & (1 << i)) > 0);
-        //printf("\t{channel=%d, n=%f}"", data.channel, data.n);
-        printf("\n\n");
-        old_data = data;
-      }
-      delay(10);
-    }
-    client.stop();
-    printf("client disconnected\n");
-  }
+  room_handle(profilabTCP);
+  profilabTCP.handle();
+
   delay(10);
 }
