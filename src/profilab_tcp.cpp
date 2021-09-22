@@ -5,6 +5,12 @@
 static void profilab_encode(profilab_data_t data, /* return value --> */ unsigned char *buffer);
 static profilab_data_t profilab_decode(unsigned char *buffer);
 
+template<typename T>
+void set_bit(T& number, uint8_t index, bool value)
+{
+    number = (number & ~(1UL << index)) | (value << index);
+}
+
 ProfilabTCP::ProfilabTCP(uint16_t port) : wifiServer(port), port(port) {
     for(int i = 0; i < 16; i++) { 
         callbacks[i] = 0;
@@ -55,7 +61,7 @@ void ProfilabTCP::handle()
             uint16_t new_tx_data = tx_data;
             for(int i = 0; i < 16; i++) {
                 if(queue_size[i] > 0 && (millis() - last_sent[i]) > PROFILAB_MESSAGE_DELAY) {
-                    new_tx_data &= 0xFFFF & (queue_pop(i));
+                    set_bit(new_tx_data, i, queue_pop(i));
                     last_sent[i] = millis();
                 }
             }
@@ -80,8 +86,13 @@ void ProfilabTCP::handle()
 
 void ProfilabTCP::tx(uint8_t pin, bool val)
 {
-    if(pin >= 16 || queue_size[pin] > 7 || queue_peek_back(pin) == val)
+    if(pin >= 16)
         return;
+    uint8_t s = queue_size[pin];
+    if( s > 7 
+        || (s > 0 && queue_peek_back(pin) == val)
+        || (s == 0 && (((tx_data & (1<<pin)) > 0) == val))
+    ) return;
     queue_push_back(pin, val);
 }
 
@@ -113,7 +124,8 @@ void ProfilabTCP::queue_push_back(uint8_t pin, bool val)
 {
     if(pin >= 16 || queue_size[pin] > 7)
         return;
-    queue[pin] &= 0xff & ((val ? 1 : 0) << queue_size[pin]++);
+    uint8_t s = queue_size[pin]++;
+    set_bit(queue[pin], s, (val ? 1 : 0));
 }
 
 void ProfilabTCP::clear_queues()
