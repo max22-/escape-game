@@ -26,7 +26,7 @@
 #define SENSORS_THRESHOLD 2000
 
 // Profilab
-#define PROFILAB_MESSAGE_DELAY 250 // milliseconds
+#define PROFILAB_MESSAGE_DELAY 500 // milliseconds
 
 
 #endif
