@@ -19,7 +19,7 @@
 #define IO5 4
 
 #define LIGHT 25
-#define PWM_FREQ 1000
+#define PWM_FREQ 1500
 
 // Optical sensors
 #define SENSORS_DELAY 20   // microseconds

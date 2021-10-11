@@ -22,7 +22,7 @@ float clamp(const float val, const float min, const float max)
 
 void light_begin(void (*task)(void*)) 
 { 
-    ledcSetup(0, PWM_FREQ, 8);
+    ledcSetup(0, PWM_FREQ, 16);
     ledcAttachPin(LIGHT, 0);
     light_task = task;
 }
@@ -37,7 +37,7 @@ void light_trigger()
 void light_set_level(float level)
 {
     current_level = level;
-    ledcWrite(0, clamp(current_level, 0, 1) * 255);
+    ledcWrite(0, pow(clamp(current_level, 0, 1), 4) * 65535);
 }
 
 void light_ramp(float target_level, float time)
