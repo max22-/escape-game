@@ -5,8 +5,6 @@
 #include "config.h"
 
 
-
-
 static TaskHandle_t task_handle = nullptr;
 static void (*light_task)(void*) = nullptr;
 static float current_level = 0;
