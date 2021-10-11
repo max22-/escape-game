@@ -31,7 +31,7 @@ void room_init(ProfilabTCP& profilabTCP)
         digitalWrite(relay, val ? HIGH : LOW);
     });
     profilabTCP.rx(8, [](bool val) {
-        digitalWrite(relay, black_light ? HIGH : LOW);
+        digitalWrite(black_light, val ? HIGH : LOW);
     });
     profilabTCP.rx(9, [](bool val) {
         light_trigger();
