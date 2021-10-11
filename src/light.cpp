@@ -40,6 +40,7 @@ void light_set_level(float level)
 
 void light_ramp(float target_level, float time)
 {
+    time *= 1000; // conversion to milliseconds
     float t = 0;
     const float inc_t = 10; // ms
     const float inc_l = inc_t * (target_level - current_level) / time;

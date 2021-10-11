@@ -18,7 +18,10 @@
 #define IO4 16
 #define IO5 4
 
+#define DOOR_RELAY IO0
+
 #define LIGHT 25
+#define BLACK_LIGHT 26
 #define PWM_FREQ 1500
 
 // Optical sensors
