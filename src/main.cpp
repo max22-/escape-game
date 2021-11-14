@@ -6,9 +6,8 @@
 #include <ArduinoOTA.h>
 #endif
 #include "rooms/rooms.h"
-#include "profilab_tcp.h"
+#include "profilab.h"
 
-ProfilabTCP profilabTCP(30000);
 
 #if defined(SALLE_ETE)
   IPAddress local_IP(192, 168, 0, 210);
@@ -45,16 +44,14 @@ void setup() {
   #ifdef USE_OTA
   ArduinoOTA.begin();
   #endif
-  profilabTCP.begin();
-  room_init(profilabTCP);
+  Profilab.begin();
+  room_init();
 }
 
 void loop() {
   #ifdef USE_OTA
   ArduinoOTA.handle();
   #endif
-  room_handle(profilabTCP);
-  profilabTCP.handle();
-
+  room_handle();
   delay(10);
 }

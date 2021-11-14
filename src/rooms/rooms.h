@@ -2,10 +2,10 @@
 #define ROOMS_H
 
 #include <Arduino.h>
-#include "profilab_tcp.h"
+#include "profilab.h"
 
-void room_init(ProfilabTCP&);
-void room_handle(ProfilabTCP&);
+void room_init();
+void room_handle();
 
 
 #endif
