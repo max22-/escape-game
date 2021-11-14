@@ -3,33 +3,16 @@
 
 #define USE_OTA
 
-// Pins
-#define SENSORS_TRIGGER 2
-#define SENSORS_DATA 36
+#if defined(SALLE_ETE)
+  #define WIFI_SSID "Salle-Ete"
+#elif defined(SALLE_AUTOMNE)
+  #define WIFI_SSID "Salle-Automne"
+#elif defined(SALLE_HIVER)
+  #define WIFI_SSID "Salle-Hiver"
+#elif defined(SALLE_PRINTEMPS)
+  #define WIFI_SSID "Salle-Printemps"
+#endif
 
-#define S0 32
-#define S1 33
-#define S2 27
-
-#define IO0 19
-#define IO1 18
-#define IO2 5
-#define IO3 17
-#define IO4 16
-#define IO5 4
-
-#define DOOR_RELAY IO0
-
-#define LIGHT 25
-#define BLACK_LIGHT 26
-#define PWM_FREQ 1500
-
-// Optical sensors
-#define SENSORS_DELAY 20   // microseconds
-#define SENSORS_THRESHOLD 2000
-
-// Profilab
-#define PROFILAB_MESSAGE_DELAY 500 // milliseconds
-
+#define WIFI_PASSWORD "chasseurs"
 
 #endif

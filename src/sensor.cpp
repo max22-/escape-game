@@ -1,5 +1,5 @@
 #include "sensor.h"
-#include "config.h"
+#include "pin_config.h"
 
 void sensors_init()
 {

@@ -2,7 +2,7 @@
 #include "freertos/task.h"
 
 #include "light.h"
-#include "config.h"
+#include "pin_config.h"
 
 
 static TaskHandle_t task_handle = nullptr;

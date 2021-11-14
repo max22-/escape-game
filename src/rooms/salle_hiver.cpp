@@ -2,7 +2,7 @@
 
 #include "rooms.h"
 #include "sensor.h"
-#include "config.h"
+#include "pin_config.h"
 #include "light.h"
 
 const uint8_t buttons[] = {23, 35, 34, 39};
