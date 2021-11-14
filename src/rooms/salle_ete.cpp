@@ -9,8 +9,8 @@ const uint8_t buttons[] = {23, 35, 34, 39};
 
 static void light_task(void* params)
 {
-    light_set_level(0);
-    light_ramp(1, 10.0);
+    Light.set_level(0);
+    Light.set_level(1, 10.0);
     while(true)
         delay(1000);
 }
@@ -23,7 +23,7 @@ void room_init()
     pinMode(DOOR_RELAY, OUTPUT);
     digitalWrite(DOOR_RELAY, LOW);
     sensors_init();
-    light_begin(light_task);
+    Light.begin();
     Profilab.rx(7, [](bool val) {
         digitalWrite(DOOR_RELAY, val ? HIGH : LOW);
     });
@@ -32,7 +32,7 @@ void room_init()
     });
     Profilab.rx(9, [](bool val) {
         if(val)
-            light_trigger();
+            Light.run_task(light_task);
     });
 }
 

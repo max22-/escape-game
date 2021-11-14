@@ -1,9 +1,21 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-void light_begin(void (*task)(void*));
-void light_trigger();
-void light_set_level(float level);
-void light_ramp(float target_level, float time);
+class LightClass {
+public:
+    LightClass();
+    void begin();
+    void run_task(void (*task)(void*));
+    void set_level(float level, float time = 0);
+
+private:
+    LightClass(const LightClass&) = delete;
+    LightClass& operator=(const LightClass&) = delete;
+
+    TaskHandle_t task_handle = nullptr;
+    float current_level = 0;
+};
+
+extern LightClass Light;
 
 #endif
