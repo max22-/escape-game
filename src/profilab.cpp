@@ -38,8 +38,10 @@ void ProfilabClass::tx(uint8_t pin, bool val)
 {
     uint16_t old_output = output, mask = ~(1<<pin);
     output = (output & mask) | (val << pin);
-    if(output != old_output)
+    if(output != old_output) {
+        Serial.printf("TX pin%d: %d\n", pin, val);
         udp.writeTo((const uint8_t*)&output, 2, remoteIP, remotePort);
+    }
 }
 
 void ProfilabClass::rx(uint8_t pin, void (*callback)(bool))
