@@ -1,16 +1,16 @@
 #include "sensor.h"
 #include "pin_config.h"
 
-void sensors_init()
+void SensorsClass::begin()
 {
-        pinMode(SENSORS_TRIGGER, OUTPUT);
-        pinMode(SENSORS_DATA, INPUT);
-        pinMode(S0, OUTPUT);
-        pinMode(S1, OUTPUT);
-        pinMode(S2, OUTPUT);
+    pinMode(SENSORS_TRIGGER, OUTPUT);
+    pinMode(SENSORS_DATA, INPUT);
+    pinMode(S0, OUTPUT);
+    pinMode(S1, OUTPUT);
+    pinMode(S2, OUTPUT);
 }
 
-uint16_t sensor_read(uint8_t sensor_number)
+uint16_t SensorsClass::read(uint8_t sensor_number)
 {
     const uint8_t s0 = sensor_number & 1 ? HIGH : LOW;
     const uint8_t s1 = sensor_number & 2 ? HIGH : LOW;
@@ -29,3 +29,7 @@ uint16_t sensor_read(uint8_t sensor_number)
     //Serial.printf("sensor %d : ambient %d, lit %d, return %d\n", sensor_number, v1, v2, abs(v2-v1));
     return abs(v2 - v1);
 }
+
+SensorsClass::SensorsClass() {}
+
+SensorsClass Sensors;

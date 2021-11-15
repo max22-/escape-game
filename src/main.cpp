@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include "config.h"
-#include "wifi_config.h"
 #include <WiFi.h>
 #ifdef USE_OTA
 #include <ArduinoOTA.h>
