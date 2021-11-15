@@ -15,4 +15,7 @@
 
 #define WIFI_PASSWORD "chasseurs"
 
+#define NIGHT (0.2)
+#define DAY (1.0)
+
 #endif

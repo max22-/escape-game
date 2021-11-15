@@ -3,21 +3,23 @@
 #include "rooms.h"
 #include "sensor.h"
 #include "pin_config.h"
+#include "config.h"
 #include "light.h"
 
 const uint8_t buttons[] = {23, 35, 34, 39};
 
 static void light_task_1(void* params)
 {
-    Light.set_level(0);
-    Light.set_level(1, 10.0);
+    Light.set_level(NIGHT);
+    Light.set_level(DAY, 8.0);
     while(true)
         delay(1000);
 }
 
 static void light_task_2(void* params)
 {
-    Light.set_level(0, 10.0);
+    Light.set_level(DAY);
+    Light.set_level(NIGHT, 6.0);
     while(true)
         delay(1000);
 }
@@ -30,6 +32,7 @@ void room_init()
     pinMode(DOOR_RELAY, OUTPUT);
     Sensors.begin();
     Light.begin();
+    Light.set_level(NIGHT);
     Profilab.rx(7, [](bool val) {
         digitalWrite(DOOR_RELAY, val ? HIGH : LOW);
     });

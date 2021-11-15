@@ -22,8 +22,11 @@ void ProfilabClass::begin()
             uint16_t changed = input ^ data;
             if(changed) {
                 for(int i = 0; i < 16; i++) {
-                    if((changed & (1 << i)) && callbacks[i] != nullptr)
-                        callbacks[i](data & (1 << i));
+                    if((changed & (1 << i)) && callbacks[i] != nullptr) {
+                        bool bitval = (data & (1 << i)) > 0;
+                        Serial.printf("RX pin%d: %d\n", i, bitval);
+                        callbacks[i](bitval);
+                    }
                 }
             }
             input = data;
