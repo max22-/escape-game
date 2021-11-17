@@ -7,6 +7,17 @@
 #include "rooms/rooms.h"
 #include "profilab.h"
 
+#include "pin_config.h"
+
+void heartbeat(void *params)
+{
+  while(true) {
+    Profilab.tx(HEARTBEAT, 1);
+    delay(500);
+    Profilab.tx(HEARTBEAT, 0);
+    delay(4500);
+  }
+}
 
 void setup() {
   Serial.begin(115200);
@@ -19,7 +30,7 @@ void setup() {
   ArduinoOTA.begin();
   #endif
   Profilab.begin();
-  room_init();
+  xTaskCreate(heartbeat, "heartbeat", 4096, nullptr, 1, nullptr);
 }
 
 void loop() {

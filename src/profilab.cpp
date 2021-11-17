@@ -4,6 +4,8 @@ static AsyncUDP udp;
 
 void ProfilabClass::begin()
 {
+    tx_mutex = xSemaphoreCreateMutex();
+    rx_mutex = xSemaphoreCreateMutex();
     if(udp.listen(1234)) {
         udp.onPacket([this](AsyncUDPPacket packet) {
             flag = true;
@@ -36,18 +38,22 @@ void ProfilabClass::begin()
 
 void ProfilabClass::tx(uint8_t pin, bool val)
 {
+    xSemaphoreTake(tx_mutex, portMAX_DELAY);
     uint16_t old_output = output, mask = ~(1<<pin);
     output = (output & mask) | (val << pin);
-    if(output != old_output) {
-        Serial.printf("TX pin%d: %d\n", pin, val);
-        udp.writeTo((const uint8_t*)&output, 2, remoteIP, remotePort);
+    if(output != old_output && flag) {
+            Serial.printf("TX pin%d: %d\n", pin, val);
+            udp.writeTo((const uint8_t*)&output, 2, remoteIP, remotePort);
     }
+    xSemaphoreGive(tx_mutex);
 }
 
 void ProfilabClass::rx(uint8_t pin, void (*callback)(bool))
 {
+    xSemaphoreTake(rx_mutex, portMAX_DELAY);
     if(pin < 16)
         callbacks[pin] = callback;
+    xSemaphoreGive(rx_mutex);
 }
 
 ProfilabClass::ProfilabClass() {}

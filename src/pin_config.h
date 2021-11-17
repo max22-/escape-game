@@ -26,4 +26,7 @@
 #define SENSORS_DELAY 20   // microseconds
 #define SENSORS_THRESHOLD 2000
 
+// Profilab
+#define HEARTBEAT 15
+
 #endif

@@ -18,9 +18,10 @@ private:
 
     void (*callbacks[16])(bool);
     uint16_t input = 0, output = 0;
-    bool flag = false;
+    bool flag = false;      // Signals when the first packet has been received
     IPAddress remoteIP;
     uint16_t remotePort;
+    SemaphoreHandle_t tx_mutex, rx_mutex;
 };
 
 extern ProfilabClass Profilab;
