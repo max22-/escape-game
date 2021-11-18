@@ -18,4 +18,6 @@
 #define NIGHT (0.2)
 #define DAY (1.0)
 
+#define SENSORS_THRESHOLD 500
+
 #endif
