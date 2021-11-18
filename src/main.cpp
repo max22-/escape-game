@@ -31,6 +31,7 @@ void setup() {
   #endif
   Profilab.begin();
   xTaskCreate(heartbeat, "heartbeat", 4096, nullptr, 1, nullptr);
+  room_init();
 }
 
 void loop() {
