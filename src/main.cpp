@@ -9,6 +9,10 @@
 
 #include "pin_config.h"
 
+IPAddress local_IP(IP_1, IP_2, IP_3, IP_4);
+IPAddress gateway(IP_1, IP_2, IP_3, 1);
+IPAddress subnet(255, 255, 255, 0);
+
 void heartbeat(void *params)
 {
   while(true) {
@@ -21,10 +25,21 @@ void heartbeat(void *params)
 
 void setup() {
   Serial.begin(115200);
-  WiFi.softAP(WIFI_SSID, WIFI_PASSWORD);
-  Serial.printf("Access point\n");
-  Serial.printf("SSID = \"%s\" \tpassword = \"%s\"\n", WIFI_SSID, WIFI_PASSWORD);
-  Serial.printf("IP : %s\n", WiFi.softAPIP().toString().c_str());
+  WiFi.mode(WIFI_STA);
+  if (!WiFi.config(local_IP, gateway, subnet)) {
+    while(true) {
+      Serial.println("STA Failed to configure");
+      delay(5000);
+    }
+  }
+  Serial.printf("Connecting to %s\n", WIFI_SSID);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+  WiFi.setAutoReconnect(true);
+  Serial.printf("\nIP : %s\n", WiFi.localIP().toString().c_str());
   #ifdef USE_OTA
   Serial.printf("OTA enabled\n");
   ArduinoOTA.begin();
