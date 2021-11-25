@@ -3,46 +3,55 @@
 #include "rooms.h"
 #include "sensor.h"
 #include "pin_config.h"
+#include "config.h"
 #include "light.h"
 
-const uint8_t buttons[] = {23, 35, 34, 39};
+const uint8_t button = 23;
 
-static void light_task(void* params)
+static void light_task_1(void* params)
 {
-    light_set_level(0);
-    light_ramp(1, 10.0);
+    Light.set_level(DAY);
+    Light.set_level(NIGHT, 8.0);
     while(true)
         delay(1000);
 }
 
-void room_init(ProfilabTCP& profilabTCP)
+static void light_task_2(void* params)
 {
-    for(int i = 0; i < sizeof(buttons); i++)
-        pinMode(buttons[i], INPUT_PULLUP);
-    pinMode(BLACK_LIGHT, OUTPUT);
+    Light.set_level(NIGHT);
+    Light.set_level(DAY, 6.0);
+    while(true)
+        delay(1000);
+}
+
+void room_init()
+{
+    pinMode(button, INPUT_PULLUP);
     pinMode(DOOR_RELAY, OUTPUT);
-    digitalWrite(DOOR_RELAY, LOW);
-    sensors_init();
-    light_begin(light_task);
-    profilabTCP.rx(7, [](bool val) {
+    pinMode(ACTUATOR, OUTPUT);
+    Sensors.begin();
+    Light.begin();
+    Light.set_level(DAY);
+    Profilab.rx(7, [](bool val) {
         digitalWrite(DOOR_RELAY, val ? HIGH : LOW);
     });
-    profilabTCP.rx(8, [](bool val) {
-        digitalWrite(BLACK_LIGHT, val ? HIGH : LOW);
-    });
-    profilabTCP.rx(9, [](bool val) {
+    Profilab.rx(9, [](bool val) {
         if(val)
-            light_trigger();
+            Light.run_task(light_task_1);
+    });
+    Profilab.rx(10, [](bool val) {
+        if(val)
+            Light.run_task(light_task_2);
+    });
+    Profilab.rx(11, [](bool val) {
+        digitalWrite(ACTUATOR, val ? HIGH : LOW);
     });
 }
 
-void room_handle(ProfilabTCP& profilabTCP)
+void room_handle()
 {
-    for(int i = 0; i < 7; i++)
-        profilabTCP.tx(i, sensor_read(i) > SENSORS_THRESHOLD);
-    
-    for(int i = 0; i < sizeof(buttons); i++)
-        profilabTCP.tx(10+i, digitalRead(buttons[i]) == LOW);
+    Profilab.tx(0, Sensors.read(0) > SENSORS_THRESHOLD);
+    Profilab.tx(10, digitalRead(button) == LOW);
 }
 
 #endif

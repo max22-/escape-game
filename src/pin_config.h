@@ -17,9 +17,12 @@
 #define IO5 4
 
 #define DOOR_RELAY IO0
-
 #define LIGHT 25
 #define BLACK_LIGHT IO1
+#define ACTUATOR IO1
+#define HOT_PLATE IO1
+#define SPOT IO2
+
 #define PWM_FREQ 1500
 
 // Optical sensors
