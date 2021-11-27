@@ -22,6 +22,8 @@
 #define ACTUATOR IO1
 #define HOT_PLATE IO1
 #define SPOT IO2
+#define LEDS_RELAY IO1
+#define LASER IO2
 
 #define PWM_FREQ 1500
 
