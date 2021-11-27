@@ -25,6 +25,7 @@ void heartbeat(void *params)
 
 void setup() {
   Serial.begin(115200);
+  pinMode(5, INPUT);  // it is in output high mode at boot !?
   WiFi.mode(WIFI_STA);
   if (!WiFi.config(local_IP, gateway, subnet)) {
     while(true) {
