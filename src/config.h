@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #define USE_OTA
+#define USE_FE_BLUETOOTH
 
 #define IP_1 192
 #define IP_2 168
@@ -10,12 +11,16 @@
 
 #if defined(SALLE_ETE)
   #define IP_4 210
+  #define DEVICE_NAME "Salle Eté"
 #elif defined(SALLE_AUTOMNE)
   #define IP_4 220
+  #define DEVICE_NAME "Salle Automne"
 #elif defined(SALLE_HIVER)
   #define IP_4 230
+  #define DEVICE_NAME "Salle Hiver"
 #elif defined(SALLE_PRINTEMPS)
   #define IP_4 240
+  #define DEVICE_NAME "Salle Printemps"
 #endif
 
 

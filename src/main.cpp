@@ -6,6 +6,7 @@
 #endif
 #include "rooms/rooms.h"
 #include "profilab.h"
+#include "fe_bluetooth.h"
 
 #include "pin_config.h"
 
@@ -26,6 +27,9 @@ void heartbeat(void *params)
 void setup() {
   Serial.begin(115200);
   pinMode(5, INPUT);  // it is in output high mode at boot !?
+  #ifdef USE_FE_BLUETOOTH
+  fe_begin();
+  #endif
   WiFi.mode(WIFI_STA);
   if (!WiFi.config(local_IP, gateway, subnet)) {
     while(true) {
