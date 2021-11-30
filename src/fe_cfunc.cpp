@@ -35,61 +35,54 @@ static fe_Object* cfunc_sensor(fe_Context *ctx, fe_Object *arg)
     return fe_number(ctx, Sensors.read(n));
 }
 
-static fe_Object* cfunc_read_threshold(fe_Context *ctx, fe_Object *arg) 
+static fe_Object* cfunc_config(fe_Context *ctx, fe_Object *arg)
 {
-    if(!preferences.isKey("SEUIL")) {
-        fe_error(ctx, "Variable SEUIL non définie");
+    char name[256];
+    float value;
+    fe_Object *fe_name, *fe_value;
+
+    if(fe_isnil(ctx, arg))
+        return fe_string(ctx, Config.dump().c_str());
+    fe_name = fe_nextarg(ctx, &arg);
+    if(fe_type(ctx, fe_name) != FE_TSTRING) {
+        fe_error(ctx, "Expected string as parameter name");
         return fe_bool(ctx, 0);
     }
-    return fe_number(ctx, preferences.getUShort("SEUIL"));
-}
-
-static fe_Object* cfunc_write_threshold(fe_Context *ctx, fe_Object *arg) 
-{
-    uint16_t threshold = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
-    preferences.putUShort("SEUIL", threshold);
-    return fe_number(ctx, threshold);
-}
-
-static fe_Object* cfunc_read_day(fe_Context *ctx, fe_Object *arg) 
-{
-    if(!preferences.isKey("JOUR")) {
-        fe_error(ctx, "Variable JOUR non définie");
+    fe_tostring(ctx, fe_name, name, sizeof(name));
+    if(name[0] == 0) {
+        fe_error(ctx, "Invalid name");
         return fe_bool(ctx, 0);
     }
-    return fe_number(ctx, preferences.getFloat("JOUR"));
+    fe_value = fe_nextarg(ctx, &arg);
+    if(fe_type(ctx, fe_value) != FE_TNUMBER) {
+        fe_error(ctx, "Expected number as parameter value");
+        return fe_bool(ctx, 0);    
+    }
+    value = fe_tonumber(ctx, fe_value);
+    if(!Config.define(name, value))
+        fe_error(ctx, "Unknown parameter");
+    return fe_bool(ctx, 0);
+    
 }
 
-static fe_Object* cfunc_write_day(fe_Context *ctx, fe_Object *arg) 
+/*
+static fe_Object* cfunc_threshold(fe_Context *ctx, fe_Object *arg) 
 {
-    float val = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
-    if(val < 0 || val > 100) {
-        fe_error(ctx, "Valeur incorrecte (entre 0 et 100)");
-        return fe_bool(ctx, 0);
+    if(fe_isnil(ctx, arg)) {
+        if(!preferences.isKey("SEUIL")) {
+            fe_error(ctx, "Variable SEUIL non définie");
+            return fe_bool(ctx, 0);
+        }
+        return fe_number(ctx, preferences.getFloat("SEUIL"));
     }
-    preferences.putFloat("JOUR", val);
-    return fe_number(ctx, val);
-}
+    else {
+        float threshold = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
 
-static fe_Object* cfunc_read_night(fe_Context *ctx, fe_Object *arg) 
-{
-    if(!preferences.isKey("NUIT")) {
-        fe_error(ctx, "Variable NUIT non définie");
-        return fe_bool(ctx, 0);
     }
-    return fe_number(ctx, preferences.getFloat("NUIT"));
+    
 }
+*/
 
-static fe_Object* cfunc_write_night(fe_Context *ctx, fe_Object *arg) 
-{
-    float val = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
-    if(val < 0 || val > 100) {
-        fe_error(ctx, "Valeur incorrecte (entre 0 et 100)");
-        return fe_bool(ctx, 0);
-    }
-    preferences.putFloat("NUIT", val);
-    return fe_number(ctx, val);
-}
 
 
 /***************************************************************************/
@@ -119,14 +112,10 @@ void fe_register_cfuncs(fe_Context *ctx)
     /* Config */
 
     fe_set(ctx, fe_symbol(ctx, "capteur"), fe_cfunc(ctx, cfunc_sensor));
-    fe_set(ctx, fe_symbol(ctx, "lire-seuil"), fe_cfunc(ctx, cfunc_read_threshold));
-    fe_set(ctx, fe_symbol(ctx, "ecrire-seuil"), fe_cfunc(ctx, cfunc_write_threshold));
-    fe_set(ctx, fe_symbol(ctx, "lire-jour"), fe_cfunc(ctx, cfunc_read_day));
-    fe_set(ctx, fe_symbol(ctx, "ecrire-jour"), fe_cfunc(ctx, cfunc_write_day));
-    fe_set(ctx, fe_symbol(ctx, "lire-nuit"), fe_cfunc(ctx, cfunc_read_night));
-    fe_set(ctx, fe_symbol(ctx, "ecrire-nuit"), fe_cfunc(ctx, cfunc_write_night));
+    fe_set(ctx, fe_symbol(ctx, "config"), fe_cfunc(ctx, cfunc_config));
+
 
 
     /**********/
 
-}
+ }

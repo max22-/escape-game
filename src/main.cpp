@@ -1,7 +1,6 @@
 #include <Arduino.h>
 #include "config.h"
 #include <WiFi.h>
-#include <Preferences.h>
 #ifdef USE_OTA
 #include <ArduinoOTA.h>
 #endif
@@ -14,8 +13,6 @@
 IPAddress local_IP(IP_1, IP_2, IP_3, IP_4);
 IPAddress gateway(IP_1, IP_2, IP_3, 1);
 IPAddress subnet(255, 255, 255, 0);
-
-Preferences preferences;
 
 void heartbeat(void *params)
 {
@@ -30,7 +27,6 @@ void heartbeat(void *params)
 void setup() {
   Serial.begin(115200);
   pinMode(5, INPUT);  // it is in output high mode at boot !?
-  preferences.begin("config", false);
   WiFi.mode(WIFI_STA);
   if (!WiFi.config(local_IP, gateway, subnet)) {
     while(true) {
@@ -46,15 +42,21 @@ void setup() {
   }
   WiFi.setAutoReconnect(true);
   Serial.printf("\nIP : %s\n", WiFi.localIP().toString().c_str());
+  #ifdef USE_FE_REPL
+  fe_begin();
+  #endif
+  while(!Config.begin()) {
+    Serial.println("Config error ! ");
+    Serial.println(Config.dump().c_str());
+    delay(5000);
+  }
   #ifdef USE_OTA
   Serial.printf("OTA enabled\n");
   ArduinoOTA.begin();
   #endif
   Profilab.begin();
   xTaskCreate(heartbeat, "heartbeat", 4096, nullptr, 1, nullptr);
-  #ifdef USE_FE_REPL
-  fe_begin();
-  #endif
+
   room_init();
 }
 

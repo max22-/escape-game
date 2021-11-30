@@ -2,8 +2,39 @@
 #define CONFIG_H
 #include <Arduino.h>
 #include <Preferences.h>
+#include <unordered_map>
 
-extern Preferences preferences;
+class ConfigClass {
+public:
+  ConfigClass();
+  bool begin();
+
+  bool define(char *name, float value);
+
+  uint16_t threshold();
+  float night();
+  float day();
+  float delay1();
+  float delay2();
+  #ifdef SALLE_PRINTEMPS
+  float delay3();
+  #endif
+
+  std::string dump();
+
+private:
+  ConfigClass(const ConfigClass&) = delete;
+  ConfigClass& operator=(const ConfigClass&) = delete;
+  Preferences preferences;
+  std::unordered_map<std::string, float*> parameters;
+
+  float _threshold, _night, _day,  _delay1, _delay2;
+  #ifdef SALLE_PRINTEMPS
+  float _delay3;
+  #endif
+};
+
+extern ConfigClass Config;
 
 #define USE_OTA
 #define USE_FE_REPL
@@ -24,10 +55,5 @@ extern Preferences preferences;
 
 #define WIFI_SSID "ARMORSTUDIO"
 #define WIFI_PASSWORD "1234554321"
-
-#define NIGHT (0.2)
-#define DAY (1.0)
-
-#define SENSORS_THRESHOLD 500
 
 #endif
