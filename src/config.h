@@ -6,7 +6,7 @@
 extern Preferences preferences;
 
 #define USE_OTA
-#define USE_FE_BLUETOOTH
+#define USE_FE_REPL
 
 #define IP_1 192
 #define IP_2 168

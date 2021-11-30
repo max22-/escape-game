@@ -7,7 +7,7 @@
 #endif
 #include "rooms/rooms.h"
 #include "profilab.h"
-#include "fe_bluetooth.h"
+#include "fe_repl.h"
 
 #include "pin_config.h"
 
@@ -31,9 +31,6 @@ void setup() {
   Serial.begin(115200);
   pinMode(5, INPUT);  // it is in output high mode at boot !?
   preferences.begin("config", false);
-  #ifdef USE_FE_BLUETOOTH
-  fe_begin();
-  #endif
   WiFi.mode(WIFI_STA);
   if (!WiFi.config(local_IP, gateway, subnet)) {
     while(true) {
@@ -55,6 +52,9 @@ void setup() {
   #endif
   Profilab.begin();
   xTaskCreate(heartbeat, "heartbeat", 4096, nullptr, 1, nullptr);
+  #ifdef USE_FE_REPL
+  fe_begin();
+  #endif
   room_init();
 }
 
