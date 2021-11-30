@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include "config.h"
 #include <WiFi.h>
+#include <Preferences.h>
 #ifdef USE_OTA
 #include <ArduinoOTA.h>
 #endif
@@ -13,6 +14,8 @@
 IPAddress local_IP(IP_1, IP_2, IP_3, IP_4);
 IPAddress gateway(IP_1, IP_2, IP_3, 1);
 IPAddress subnet(255, 255, 255, 0);
+
+Preferences preferences;
 
 void heartbeat(void *params)
 {
@@ -27,6 +30,7 @@ void heartbeat(void *params)
 void setup() {
   Serial.begin(115200);
   pinMode(5, INPUT);  // it is in output high mode at boot !?
+  preferences.begin("config", false);
   #ifdef USE_FE_BLUETOOTH
   fe_begin();
   #endif

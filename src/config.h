@@ -1,6 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 #include <Arduino.h>
+#include <Preferences.h>
+
+extern Preferences preferences;
 
 #define USE_OTA
 #define USE_FE_BLUETOOTH
