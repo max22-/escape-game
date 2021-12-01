@@ -10,31 +10,31 @@ const uint8_t buttons[] = {23, 35, 34, 39, IO3, IO4, IO5};
 
 static void light_task_1(void* params)
 {
-    Light.set_level(NIGHT);
+    Light.set_level(Config.night());
     while(true)
         delay(1000);
 }
 
 static void light_task_2(void* params)
 {
-    Light.set_level(NIGHT);
-    Light.set_level(DAY, 8.0);
+    Light.set_level(Config.night());
+    Light.set_level(Config.day(), Config.delay1());
     while(true)
         delay(1000);
 }
 
 static void light_task_3(void* params)
 {
-    Light.set_level(DAY);
-    Light.set_level(NIGHT, 5.0);
+    Light.set_level(Config.day());
+    Light.set_level(Config.night(), Config.delay2());
     while(true)
         delay(1000);
 }
 
 static void light_task_4(void* params)
 {
-    Light.set_level(DAY);
-    Light.set_level(NIGHT, 6.0);
+    Light.set_level(Config.day());
+    Light.set_level(Config.night(), Config.delay3());
     while(true)
         delay(1000);
 }
@@ -50,7 +50,7 @@ void room_init()
     pinMode(LASER, OUTPUT);
     digitalWrite(LASER, LOW);
     Light.begin();
-    Light.set_level(NIGHT);
+    Light.set_level(Config.night());
     Profilab.rx(0, [](bool val) {
         if(val)
             Light.run_task(light_task_1);
