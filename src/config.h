@@ -16,6 +16,10 @@ public:
   float day();
   float delay1();
   float delay2();
+  #ifdef SALLE_HIVER
+  float twilight1();
+  float twilight2();
+  #endif
   #ifdef SALLE_PRINTEMPS
   float delay3();
   #endif
@@ -29,6 +33,9 @@ private:
   std::unordered_map<std::string, float*> parameters;
 
   float _threshold, _night, _day,  _delay1, _delay2;
+  #ifdef SALLE_HIVER
+  float _twilight1, _twilight2;
+  #endif
   #ifdef SALLE_PRINTEMPS
   float _delay3;
   #endif

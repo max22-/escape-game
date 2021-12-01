@@ -11,8 +11,8 @@ static void light_task(void* params)
 {
     Light.set_level(0.4);
     for(int i = 0; i < 5; i++) {
-        Light.set_level(0.6, 4);
-        Light.set_level(0.4, 4);
+        Light.set_level(Config.twilight1(), Config.delay1());
+        Light.set_level(Config.twilight2(), Config.delay2());
     }
     while(true)
         delay(1000);
@@ -45,7 +45,7 @@ void room_init()
 void room_handle()
 {
     for(int i = 0; i < 7; i++)
-        Profilab.tx(i, Sensors.read(i) > SENSORS_THRESHOLD);
+        Profilab.tx(i, Sensors.read(i) > Config.threshold());
 }
 
 #endif
