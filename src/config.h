@@ -52,13 +52,19 @@ extern ConfigClass Config;
 
 #if defined(SALLE_ETE)
   #define IP_4 210
+  #define SOFT_AP_SSID "SSID-0"
 #elif defined(SALLE_AUTOMNE)
   #define IP_4 220
+  #define SOFT_AP_SSID "SSID-1"
 #elif defined(SALLE_HIVER)
   #define IP_4 230
+  #define SOFT_AP_SSID "SSID-2"
 #elif defined(SALLE_PRINTEMPS)
   #define IP_4 240
+  #define SOFT_AP_SSID "SSID-3"
 #endif
+
+#define SOFT_AP_PASSWORD "eogheog6f6z"
 
 #define WIFI_SSID "ARMORSTUDIO"
 #define WIFI_PASSWORD "1234554321"

@@ -27,7 +27,8 @@ void heartbeat(void *params)
 void setup() {
   Serial.begin(115200);
   pinMode(5, INPUT);  // it is in output high mode at boot !?
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP(SOFT_AP_SSID, SOFT_AP_PASSWORD, 1, 1);
   if (!WiFi.config(local_IP, gateway, subnet)) {
     while(true) {
       Serial.println("STA Failed to configure");
