@@ -6,6 +6,7 @@
 #endif
 #include "rooms/rooms.h"
 #include "profilab.h"
+#include "fe_repl.h"
 
 #include "pin_config.h"
 
@@ -26,7 +27,8 @@ void heartbeat(void *params)
 void setup() {
   Serial.begin(115200);
   pinMode(5, INPUT);  // it is in output high mode at boot !?
-  WiFi.mode(WIFI_STA);
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.softAP(SOFT_AP_SSID, SOFT_AP_PASSWORD, 1, 1);
   if (!WiFi.config(local_IP, gateway, subnet)) {
     while(true) {
       Serial.println("STA Failed to configure");
@@ -41,12 +43,21 @@ void setup() {
   }
   WiFi.setAutoReconnect(true);
   Serial.printf("\nIP : %s\n", WiFi.localIP().toString().c_str());
+  #ifdef USE_FE_REPL
+  fe_begin();
+  #endif
+  while(!Config.begin()) {
+    Serial.println("Config error ! ");
+    Serial.println(Config.dump().c_str());
+    delay(5000);
+  }
   #ifdef USE_OTA
   Serial.printf("OTA enabled\n");
   ArduinoOTA.begin();
   #endif
   Profilab.begin();
   xTaskCreate(heartbeat, "heartbeat", 4096, nullptr, 1, nullptr);
+
   room_init();
 }
 

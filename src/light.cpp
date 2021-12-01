@@ -28,6 +28,7 @@ void LightClass::run_task(void (*task)(void*))
 
 void LightClass::set_level(float level, float time)
 {
+    level /= 100;
     if(time == 0) {
         current_level = level;
         ledcWrite(0, pow(clamp(current_level, 0, 1), 4) * 65535);
