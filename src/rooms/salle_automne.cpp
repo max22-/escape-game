@@ -10,16 +10,16 @@ const uint8_t button = 23;
 
 static void light_task_1(void* params)
 {
-    Light.set_level(DAY);
-    Light.set_level(NIGHT, 8.0);
+    Light.set_level(Config.day());
+    Light.set_level(Config.night(), Config.delay1());
     while(true)
         delay(1000);
 }
 
 static void light_task_2(void* params)
 {
-    Light.set_level(NIGHT);
-    Light.set_level(DAY, 6.0);
+    Light.set_level(Config.night());
+    Light.set_level(Config.day(), Config.delay2());
     while(true)
         delay(1000);
 }
@@ -31,7 +31,7 @@ void room_init()
     pinMode(ACTUATOR, OUTPUT);
     Sensors.begin();
     Light.begin();
-    Light.set_level(DAY);
+    Light.set_level(Config.day());
     Profilab.rx(7, [](bool val) {
         digitalWrite(DOOR_RELAY, val ? HIGH : LOW);
     });
@@ -50,7 +50,7 @@ void room_init()
 
 void room_handle()
 {
-    Profilab.tx(0, Sensors.read(0) > SENSORS_THRESHOLD);
+    Profilab.tx(0, Sensors.read(0) > Config.threshold());
     Profilab.tx(10, digitalRead(button) == LOW);
 }
 
