@@ -16,29 +16,29 @@ public:
   float day();
   float delay1();
   float delay2();
-  #ifdef SALLE_HIVER
+#ifdef SALLE_HIVER
   float twilight1();
   float twilight2();
-  #endif
-  #ifdef SALLE_PRINTEMPS
+#endif
+#ifdef SALLE_PRINTEMPS
   float delay3();
-  #endif
+#endif
 
   std::string dump();
 
 private:
-  ConfigClass(const ConfigClass&) = delete;
-  ConfigClass& operator=(const ConfigClass&) = delete;
+  ConfigClass(const ConfigClass &) = delete;
+  ConfigClass &operator=(const ConfigClass &) = delete;
   Preferences preferences;
-  std::unordered_map<std::string, float*> parameters;
+  std::unordered_map<std::string, float *> parameters;
 
-  float _threshold, _night, _day,  _delay1, _delay2;
-  #ifdef SALLE_HIVER
+  float _threshold, _night, _day, _delay1, _delay2;
+#ifdef SALLE_HIVER
   float _twilight1, _twilight2;
-  #endif
-  #ifdef SALLE_PRINTEMPS
+#endif
+#ifdef SALLE_PRINTEMPS
   float _delay3;
-  #endif
+#endif
 };
 
 extern ConfigClass Config;
@@ -51,17 +51,17 @@ extern ConfigClass Config;
 #define IP_3 0
 
 #if defined(SALLE_ETE)
-  #define IP_4 210
-  #define SOFT_AP_SSID "SSID-0"
+#define IP_4 210
+#define SOFT_AP_SSID "SSID-0"
 #elif defined(SALLE_AUTOMNE)
-  #define IP_4 220
-  #define SOFT_AP_SSID "SSID-1"
+#define IP_4 220
+#define SOFT_AP_SSID "SSID-1"
 #elif defined(SALLE_HIVER)
-  #define IP_4 230
-  #define SOFT_AP_SSID "SSID-2"
+#define IP_4 230
+#define SOFT_AP_SSID "SSID-2"
 #elif defined(SALLE_PRINTEMPS)
-  #define IP_4 240
-  #define SOFT_AP_SSID "SSID-3"
+#define IP_4 240
+#define SOFT_AP_SSID "SSID-3"
 #endif
 
 #define SOFT_AP_PASSWORD "eogheog6f6z"

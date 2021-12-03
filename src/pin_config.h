@@ -28,7 +28,7 @@
 #define PWM_FREQ 1500
 
 // Optical sensors
-#define SENSORS_DELAY 20   // microseconds
+#define SENSORS_DELAY 20 // microseconds
 
 // Profilab
 #define HEARTBEAT 15

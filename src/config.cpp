@@ -2,59 +2,55 @@
 #include <sstream>
 
 ConfigClass::ConfigClass() {
-    parameters = {
-        {"seuil", &_threshold},
-        #ifndef SALLE_HIVER
-        {"nuit", &_night},
-        {"jour", &_day},
-        #endif
-        {"tempo1", &_delay1},
-        {"tempo2", &_delay2},
-        #ifdef SALLE_HIVER
-        {"crepuscule1", &_twilight1},
-        {"crepuscule2", &_twilight2},
-        #endif
-        #ifdef SALLE_PRINTEMPS
-        {"tempo3", &_delay3},
-        #endif
+  parameters = {
+      {"seuil", &_threshold},
+#ifndef SALLE_HIVER
+      {"nuit", &_night},
+      {"jour", &_day},
+#endif
+      {"tempo1", &_delay1},
+      {"tempo2", &_delay2},
+#ifdef SALLE_HIVER
+      {"crepuscule1", &_twilight1},
+      {"crepuscule2", &_twilight2},
+#endif
+#ifdef SALLE_PRINTEMPS
+      {"tempo3", &_delay3},
+#endif
 
-    };
+  };
 }
 
-
-bool ConfigClass::begin()
-{
-    preferences.begin("config", false);
-    for(const auto p: parameters) {
-        if(preferences.isKey(p.first.c_str()))
-            *p.second = preferences.getFloat(p.first.c_str());
-        else
-            return false;
-    }
-    return true;
+bool ConfigClass::begin() {
+  preferences.begin("config", false);
+  for (const auto p : parameters) {
+    if (preferences.isKey(p.first.c_str()))
+      *p.second = preferences.getFloat(p.first.c_str());
+    else
+      return false;
+  }
+  return true;
 }
 
-bool ConfigClass::define(char *name, float value)
-{
-    if(parameters.count(name) == 0)
-        return false;
-    preferences.putFloat(name, value);
-    *parameters[name] = value;
-    return true;
+bool ConfigClass::define(char *name, float value) {
+  if (parameters.count(name) == 0)
+    return false;
+  preferences.putFloat(name, value);
+  *parameters[name] = value;
+  return true;
 }
 
-std::string ConfigClass::dump()
-{
-    std::stringstream result;
-    for(const auto p: parameters) {
-        result << p.first << ":\t";
-        if(preferences.isKey(p.first.c_str()))
-            result << preferences.getFloat(p.first.c_str());
-        else
-             result << "?";
-        result << std::endl;
-    }
-    return result.str();
+std::string ConfigClass::dump() {
+  std::stringstream result;
+  for (const auto p : parameters) {
+    result << p.first << ":\t";
+    if (preferences.isKey(p.first.c_str()))
+      result << preferences.getFloat(p.first.c_str());
+    else
+      result << "?";
+    result << std::endl;
+  }
+  return result.str();
 }
 
 #ifndef SALLE_HIVER
