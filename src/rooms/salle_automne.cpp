@@ -6,7 +6,7 @@
 #include "rooms.h"
 #include "sensor.h"
 
-const uint8_t button = 23;
+const uint8_t button = 35;
 
 static void light_task_1(void *params) {
   Light.set_level(Config.day());
