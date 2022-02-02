@@ -4,6 +4,10 @@
 ConfigClass::ConfigClass() {
   parameters = {
       {"seuil", &_threshold},
+#ifdef SALLE_AUTOMNE
+      {"tempo_coffre_1", &_chest_delay_1},
+      {"tempo_coffre_2", &_chest_delay_2},
+#endif
 #ifndef SALLE_HIVER
       {"nuit", &_night},
       {"jour", &_day},

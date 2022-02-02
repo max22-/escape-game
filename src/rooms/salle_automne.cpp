@@ -22,10 +22,32 @@ static void light_task_2(void *params) {
     delay(1000);
 }
 
+xTaskHandle chest_task_handle = NULL;
+
+static void chest_task(void *params) {
+  int dir = (int)params;
+  Serial.printf("delay 1 = %d\n", (int)Config.chest_delay_1());
+  Serial.printf("delay 2 = %d\n", (int)Config.chest_delay_2());
+  digitalWrite(CHEST_RELAY_1, dir ? HIGH : LOW);
+  digitalWrite(CHEST_RELAY_2, dir ? LOW : HIGH);
+  delay(Config.chest_delay_1()*1000);
+  digitalWrite(CHEST_RELAY_1, LOW);
+  digitalWrite(CHEST_RELAY_2, LOW);
+  delay(Config.chest_delay_2()*1000);
+  digitalWrite(CHEST_RELAY_1, dir ? LOW : HIGH);
+  digitalWrite(CHEST_RELAY_2, dir ? HIGH : LOW); 
+  delay(Config.chest_delay_1()*1000);
+  digitalWrite(CHEST_RELAY_1, LOW);
+  digitalWrite(CHEST_RELAY_2, LOW);
+  chest_task_handle = NULL;
+  vTaskDelete(NULL);
+}
+
 void room_init() {
   pinMode(button, INPUT_PULLUP);
   pinMode(DOOR_RELAY, OUTPUT);
-  pinMode(ACTUATOR, OUTPUT);
+  pinMode(CHEST_RELAY_1, OUTPUT);
+  pinMode(CHEST_RELAY_2, OUTPUT);
   Sensors.begin();
   Light.begin();
   Light.set_level(Config.day());
@@ -38,7 +60,11 @@ void room_init() {
     if (val)
       Light.run_task(light_task_2);
   });
-  Profilab.rx(11, [](bool val) { digitalWrite(ACTUATOR, val ? HIGH : LOW); });
+  Profilab.rx(11, [](bool val) { 
+    if(chest_task_handle != NULL)
+      vTaskDelete(chest_task_handle);
+    xTaskCreate(chest_task, "chest_task", 3000, (void*)val, 1, &chest_task_handle); }
+  );
 }
 
 void room_handle() {

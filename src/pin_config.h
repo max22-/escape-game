@@ -19,7 +19,8 @@
 #define DOOR_RELAY IO0
 #define LIGHT 25
 #define BLACK_LIGHT IO1
-#define ACTUATOR IO1
+#define CHEST_RELAY_1 IO1
+#define CHEST_RELAY_2 IO2
 #define HOT_PLATE IO1
 #define SPOT IO2
 #define LEDS_RELAY IO1
