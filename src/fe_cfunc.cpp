@@ -25,6 +25,11 @@ static fe_Object *cfunc_digitalWrite(fe_Context *ctx, fe_Object *arg) {
   return fe_bool(ctx, 0);
 }
 
+static fe_Object *cfunc_digitalRead(fe_Context *ctx, fe_Object *arg) {
+  uint8_t pin = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  return fe_number(ctx, digitalRead(pin));
+}
+
 static fe_Object *cfunc_sensor(fe_Context *ctx, fe_Object *arg) {
   uint8_t n = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
   if (n > 7) {
@@ -104,6 +109,8 @@ void fe_register_cfuncs(fe_Context *ctx) {
   fe_set(ctx, fe_symbol(ctx, "pinMode"), fe_cfunc(ctx, cfunc_pinMode));
   fe_set(ctx, fe_symbol(ctx, "digitalWrite"),
          fe_cfunc(ctx, cfunc_digitalWrite));
+  fe_set(ctx, fe_symbol(ctx, "digitalRead"),
+         fe_cfunc(ctx, cfunc_digitalRead));
 
   /* Config */
 
