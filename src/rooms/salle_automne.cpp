@@ -24,21 +24,41 @@ static void light_task_2(void *params) {
 
 xTaskHandle chest_task_handle = NULL;
 
+void open_chest()
+{
+  digitalWrite(CHEST_RELAY_1, LOW);
+  digitalWrite(CHEST_RELAY_2, HIGH);
+}
+
+void close_chest()
+{
+  digitalWrite(CHEST_RELAY_1, HIGH);
+  digitalWrite(CHEST_RELAY_2, LOW);
+}
+
+void stop_chest()
+{
+  digitalWrite(CHEST_RELAY_1, LOW);
+  digitalWrite(CHEST_RELAY_2, LOW);
+}
+
 static void chest_task(void *params) {
-  int dir = (int)params;
   Serial.printf("delay 1 = %d\n", (int)Config.chest_delay_1());
   Serial.printf("delay 2 = %d\n", (int)Config.chest_delay_2());
-  digitalWrite(CHEST_RELAY_1, dir ? HIGH : LOW);
-  digitalWrite(CHEST_RELAY_2, dir ? LOW : HIGH);
+  open_chest();
   delay(Config.chest_delay_1()*1000);
-  digitalWrite(CHEST_RELAY_1, LOW);
-  digitalWrite(CHEST_RELAY_2, LOW);
+  stop_chest();
   delay(Config.chest_delay_2()*1000);
-  digitalWrite(CHEST_RELAY_1, dir ? LOW : HIGH);
-  digitalWrite(CHEST_RELAY_2, dir ? HIGH : LOW); 
+  close_chest();
   delay(Config.chest_delay_1()*1000);
-  digitalWrite(CHEST_RELAY_1, LOW);
-  digitalWrite(CHEST_RELAY_2, LOW);
+  stop_chest();
+  chest_task_handle = NULL;
+  vTaskDelete(NULL);
+}
+
+static void chest_manual_task(void *params) {
+  close_chest();
+  delay(Config.chest_delay_1()*1000); 
   chest_task_handle = NULL;
   vTaskDelete(NULL);
 }
@@ -52,6 +72,11 @@ void room_init() {
   Light.begin();
   Light.set_level(Config.day());
   Profilab.rx(7, [](bool val) { digitalWrite(DOOR_RELAY, val ? HIGH : LOW); });
+  Profilab.rx(8, [](bool val) {
+    if(chest_task_handle != NULL)
+      vTaskDelete(chest_task_handle);
+    xTaskCreate(chest_manual_task, "chest_manual_task", 3000, NULL, 1, &chest_task_handle);
+  });
   Profilab.rx(9, [](bool val) {
     if (val)
       Light.run_task(light_task_1);
@@ -63,7 +88,7 @@ void room_init() {
   Profilab.rx(11, [](bool val) { 
     if(chest_task_handle != NULL)
       vTaskDelete(chest_task_handle);
-    xTaskCreate(chest_task, "chest_task", 3000, (void*)val, 1, &chest_task_handle); }
+    xTaskCreate(chest_task, "chest_task", 3000, NULL, 1, &chest_task_handle); }
   );
 }
 
