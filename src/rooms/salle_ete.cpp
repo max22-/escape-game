@@ -6,7 +6,7 @@
 #include "rooms.h"
 #include "sensor.h"
 
-const uint8_t buttons[] = {23, 35, 34, 39};
+const uint8_t buttons[] = {21, 35, 34, 39};
 
 static void light_task_1(void *params) {
   Light.set_level(Config.night());
