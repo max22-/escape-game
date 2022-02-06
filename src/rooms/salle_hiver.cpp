@@ -7,11 +7,13 @@
 #include "sensor.h"
 
 static void light_task(void *params) {
-  Light.set_level(0.4);
-  for (int i = 0; i < 5; i++) {
-    Light.set_level(Config.twilight1(), Config.delay1());
-    Light.set_level(Config.twilight2(), Config.delay2());
-  }
+  Light.set_level(80);
+  Light.set_level(50, 180);
+  Light.set_level(70, 180);
+  Light.set_level(40, 180);
+  Light.set_level(80, 180);
+  Light.set_level(30, 180);
+
   while (true)
     delay(1000);
 }
@@ -22,7 +24,7 @@ void room_init() {
   pinMode(SPOT, OUTPUT);
   Sensors.begin();
   Light.begin();
-  Light.set_level(0.4);
+  Light.set_level(80);
   Profilab.rx(0, [](bool val) {
     if (val)
       Light.run_task(light_task);
