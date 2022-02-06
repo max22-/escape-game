@@ -28,13 +28,6 @@ static void light_task_3(void *params) {
     delay(1000);
 }
 
-static void light_task_4(void *params) {
-  Light.set_level(Config.day());
-  Light.set_level(Config.night(), Config.delay3());
-  while (true)
-    delay(1000);
-}
-
 void room_init() {
   for (int i = 0; i < sizeof(buttons); i++)
     pinMode(buttons[i], INPUT_PULLUP);
@@ -52,13 +45,9 @@ void room_init() {
     if (val)
       Light.run_task(light_task_2);
   });
-  Profilab.rx(6, [](bool val) {
-    if (val)
-      Light.run_task(light_task_3);
-  });
   Profilab.rx(10, [](bool val) {
     if (val)
-      Light.run_task(light_task_4);
+      Light.run_task(light_task_3);
   });
   Profilab.rx(7, [](bool val) { digitalWrite(DOOR_RELAY, val ? HIGH : LOW); });
   Profilab.rx(12, [](bool val) { digitalWrite(LEDS_RELAY, val ? HIGH : LOW); });

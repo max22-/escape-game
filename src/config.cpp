@@ -14,9 +14,6 @@ ConfigClass::ConfigClass() {
 #endif
       {"tempo1", &_delay1},
       {"tempo2", &_delay2},
-#ifdef SALLE_PRINTEMPS
-      {"tempo3", &_delay3},
-#endif
 
   };
 }
@@ -65,8 +62,5 @@ float ConfigClass::day() { return _day; }
 uint16_t ConfigClass::threshold() { return _threshold; }
 float ConfigClass::delay1() { return _delay1; }
 float ConfigClass::delay2() { return _delay2; }
-#ifdef SALLE_PRINTEMPS
-float ConfigClass::delay3() { return _delay3; }
-#endif
 
 ConfigClass Config;

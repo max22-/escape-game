@@ -20,9 +20,6 @@ public:
   float chest_delay_1();
   float chest_delay_2();
 #endif
-#ifdef SALLE_PRINTEMPS
-  float delay3();
-#endif
 
   std::string dump();
 
@@ -36,9 +33,6 @@ private:
 #ifdef SALLE_AUTOMNE
   float _chest_delay_1;
   float _chest_delay_2;
-#endif
-#ifdef SALLE_PRINTEMPS
-  float _delay3;
 #endif
 };
 
