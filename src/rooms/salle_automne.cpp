@@ -22,6 +22,12 @@ static void light_task_2(void *params) {
     delay(1000);
 }
 
+static void light_task_set_day(void *params) {
+  Light.set_level(Config.day());
+  while(true)
+    delay(1000);
+}
+
 xTaskHandle chest_task_handle = NULL;
 
 void open_chest()
@@ -71,6 +77,10 @@ void room_init() {
   Sensors.begin();
   Light.begin();
   Light.set_level(Config.day());
+  Profilab.rx(4, [](bool val) {
+    if (val)
+      Light.run_task(light_task_set_day);
+  });
   Profilab.rx(7, [](bool val) { digitalWrite(DOOR_RELAY, val ? HIGH : LOW); });
   Profilab.rx(8, [](bool val) {
     if(chest_task_handle != NULL)
