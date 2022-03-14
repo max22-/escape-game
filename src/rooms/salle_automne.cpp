@@ -88,12 +88,16 @@ void room_init() {
     xTaskCreate(chest_manual_task, "chest_manual_task", 3000, NULL, 1, &chest_task_handle);
   });
   Profilab.rx(9, [](bool val) {
-    if (val)
+    if (val) {
+      Serial.println("Starting light task 1");
       Light.run_task(light_task_1);
+    }
   });
   Profilab.rx(10, [](bool val) {
-    if (val)
+    if (val) {
+      Serial.println("Starting light task 1");
       Light.run_task(light_task_2);
+    }
   });
   Profilab.rx(11, [](bool val) { 
     if(chest_task_handle != NULL)
