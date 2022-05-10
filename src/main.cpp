@@ -42,6 +42,10 @@ void setup() {
   }
   WiFi.setAutoReconnect(true);
   Serial.printf("\nIP : %s\n", WiFi.localIP().toString().c_str());
+#ifdef USE_OTA
+  Serial.printf("OTA enabled\n");
+  ArduinoOTA.begin();
+#endif
 #ifdef USE_FE_REPL
   fe_begin();
 #endif
@@ -50,10 +54,6 @@ void setup() {
     Serial.println(Config.dump().c_str());
     delay(5000);
   }
-#ifdef USE_OTA
-  Serial.printf("OTA enabled\n");
-  ArduinoOTA.begin();
-#endif
   Profilab.begin();
   xTaskCreate(heartbeat, "heartbeat", 4096, nullptr, 1, nullptr);
 
