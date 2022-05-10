@@ -3,9 +3,35 @@
 #include "pin_config.h"
 #include "sensor.h"
 #include <nvs_flash.h>
+#include <WiFi.h>
+
+extern WiFiClient client;
+static fe_Object *cfunc_display(fe_Context *ctx, fe_Object *arg) {
+  char buf[64];
+  if(client.connected()) {
+    fe_tostring(ctx, fe_nextarg(ctx, &arg), buf, sizeof(buf));
+    buf[60] = buf[61] = buf[62]= '.'; /* if the string is too long, we display '...' at the end */
+    buf[63] = 0;
+    client.write(buf);
+    client.write("\n");
+  }
+  return fe_bool(ctx, 0);
+}
+
+static fe_Object *cfunc_delay(fe_Context *ctx, fe_Object *arg) {
+  uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  delay(ms);
+  return fe_bool(ctx, 0);
+}
+
+static fe_Object *cfunc_millis(fe_Context *ctx, fe_Object *arg) {
+  return fe_number(ctx, millis());
+}
 
 static fe_Object *cfunc_restart(fe_Context *ctx, fe_Object *arg) {
   Serial.println("Restarting...");
+  if(client.connected())
+    client.write("Restarting...");
   delay(1000);
   ESP.restart();
   return fe_bool(ctx, 0);
@@ -38,6 +64,38 @@ static fe_Object *cfunc_sensor(fe_Context *ctx, fe_Object *arg) {
   }
   return fe_number(ctx, Sensors.read(n));
 }
+
+static fe_Object *cfunc_sensor_max(fe_Context *ctx, fe_Object *arg) {
+  uint8_t n = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  uint16_t res = 0;
+  unsigned long ts;
+  if (n > 7) {
+    fe_error(ctx, "Invalid sensor number");
+    return fe_bool(ctx, 0);
+  }
+  ts = millis();
+  while(millis() - ts <= ms)
+    res = max(res, Sensors.read(n));
+  return fe_number(ctx, res);
+}
+
+static fe_Object *cfunc_sensor_min(fe_Context *ctx, fe_Object *arg) {
+  uint8_t n = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  uint16_t res = 4095;
+  unsigned long ts;
+  if (n > 7) {
+    fe_error(ctx, "Invalid sensor number");
+    return fe_bool(ctx, 0);
+  }
+  ts = millis();
+  while(millis() - ts <= ms)
+    res = min(res, Sensors.read(n));
+  return fe_number(ctx, res);
+}
+
+
 
 static fe_Object *cfunc_config(fe_Context *ctx, fe_Object *arg) {
   char name[256];
@@ -105,6 +163,9 @@ void fe_register_cfuncs(fe_Context *ctx) {
   fe_set(ctx, fe_symbol(ctx, "LOW"), fe_number(ctx, (float)LOW));
   /* ***********/
 
+  fe_set(ctx, fe_symbol(ctx, "display"), fe_cfunc(ctx, cfunc_display));
+  fe_set(ctx, fe_symbol(ctx, "delay"), fe_cfunc(ctx, cfunc_delay));
+  fe_set(ctx, fe_symbol(ctx, "millis"), fe_cfunc(ctx, cfunc_millis));
   fe_set(ctx, fe_symbol(ctx, "restart"), fe_cfunc(ctx, cfunc_restart));
   fe_set(ctx, fe_symbol(ctx, "pinMode"), fe_cfunc(ctx, cfunc_pinMode));
   fe_set(ctx, fe_symbol(ctx, "digitalWrite"),
@@ -114,7 +175,9 @@ void fe_register_cfuncs(fe_Context *ctx) {
 
   /* Config */
 
-  fe_set(ctx, fe_symbol(ctx, "capteur"), fe_cfunc(ctx, cfunc_sensor));
+  fe_set(ctx, fe_symbol(ctx, "sensor"), fe_cfunc(ctx, cfunc_sensor));
+  fe_set(ctx, fe_symbol(ctx, "sensor-max"), fe_cfunc(ctx, cfunc_sensor_max));
+  fe_set(ctx, fe_symbol(ctx, "sensor-min"), fe_cfunc(ctx, cfunc_sensor_min));
   fe_set(ctx, fe_symbol(ctx, "config"), fe_cfunc(ctx, cfunc_config));
 
   /**********/

@@ -9,7 +9,7 @@ extern "C" {
 #include "fe_cfunc.h"
 
 static WiFiServer wifiServer(23);
-static WiFiClient client; // global because we need it in onerror
+WiFiClient client;
 static jmp_buf toplevel;
 static char data[10000];
 static fe_Context *ctx = NULL;
