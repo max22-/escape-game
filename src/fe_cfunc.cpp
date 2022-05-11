@@ -1,20 +1,19 @@
 #include "fe_cfunc.h"
+#include "fe_repl.h"
+#include "log.h"
 #include "config.h"
 #include "pin_config.h"
 #include "sensor.h"
 #include <nvs_flash.h>
 #include <WiFi.h>
 
-extern WiFiClient client;
 static fe_Object *cfunc_display(fe_Context *ctx, fe_Object *arg) {
   char buf[64];
-  if(client.connected()) {
-    fe_tostring(ctx, fe_nextarg(ctx, &arg), buf, sizeof(buf));
-    buf[60] = buf[61] = buf[62]= '.'; /* if the string is too long, we display '...' at the end */
-    buf[63] = 0;
-    client.write(buf);
-    client.write("\n");
-  }
+  fe_tostring(ctx, fe_nextarg(ctx, &arg), buf, sizeof(buf));
+  buf[60] = buf[61] = buf[62]= '.'; /* if the string is too long, we display '...' at the end */
+  buf[63] = 0;
+  wifi_client_write(buf);
+  wifi_client_write("\n");
   return fe_bool(ctx, 0);
 }
 
@@ -30,8 +29,7 @@ static fe_Object *cfunc_millis(fe_Context *ctx, fe_Object *arg) {
 
 static fe_Object *cfunc_restart(fe_Context *ctx, fe_Object *arg) {
   Serial.println("Restarting...");
-  if(client.connected())
-    client.write("Restarting...");
+  wifi_client_write("Restarting...");
   delay(1000);
   ESP.restart();
   return fe_bool(ctx, 0);
@@ -54,6 +52,16 @@ static fe_Object *cfunc_digitalWrite(fe_Context *ctx, fe_Object *arg) {
 static fe_Object *cfunc_digitalRead(fe_Context *ctx, fe_Object *arg) {
   uint8_t pin = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
   return fe_number(ctx, digitalRead(pin));
+}
+
+static fe_Object *cfunc_log_enable(fe_Context *ctx, fe_Object *arg) {
+  log_enabled = true;
+  return fe_bool(ctx, 0);
+}
+
+static fe_Object *cfunc_log_disable(fe_Context *ctx, fe_Object *arg) {
+  log_enabled = false;
+  return fe_bool(ctx, 0);
 }
 
 static fe_Object *cfunc_sensor(fe_Context *ctx, fe_Object *arg) {
@@ -172,6 +180,10 @@ void fe_register_cfuncs(fe_Context *ctx) {
          fe_cfunc(ctx, cfunc_digitalWrite));
   fe_set(ctx, fe_symbol(ctx, "digitalRead"),
          fe_cfunc(ctx, cfunc_digitalRead));
+  fe_set(ctx, fe_symbol(ctx, "log-enable"),
+         fe_cfunc(ctx, cfunc_log_enable));
+  fe_set(ctx, fe_symbol(ctx, "log-disable"),
+         fe_cfunc(ctx, cfunc_log_disable));
 
   /* Config */
 

@@ -16,10 +16,28 @@ static fe_Context *ctx = NULL;
 static int gc;
 static fe_Object *obj;
 static void repl_task(void *);
+static SemaphoreHandle_t client_mutex;
+
+void wifi_client_write(const char *s)
+{
+  xSemaphoreTake(client_mutex, portMAX_DELAY);
+  if(client.connected())
+    client.write(s);
+  xSemaphoreGive(client_mutex);
+}
+
+void wifi_client_write(char c)
+{
+  xSemaphoreTake(client_mutex, portMAX_DELAY);
+  if(client.connected())
+    client.write(c);
+  xSemaphoreGive(client_mutex);
+}
 
 void fe_begin() {
   Serial.println("Starting Fe repl...");
   wifiServer.begin();
+  client_mutex = xSemaphoreCreateMutex();
   ctx = fe_open(data, sizeof(data));
   fe_register_cfuncs(ctx);
   gc = fe_savegc(ctx);
@@ -33,17 +51,23 @@ void fe_end() {
 
 static char readwifi(fe_Context *ctx, void *userdata) {
   char c;
-  while (client.available() == 0 && client.connected())
-    ;
+  while(true) {
+    xSemaphoreTake(client_mutex, portMAX_DELAY);
+    if(!client.connected() || client.available() > 0)
+      break;
+    xSemaphoreGive(client_mutex);
+    delay(100);
+  }
   if (!client.connected())
-    return 0;
-  c = client.read();
+    c = 0;
+  else 
+    c = client.read();
+  xSemaphoreGive(client_mutex);
   return c;
 }
 
 static void writewifi(fe_Context *ctx, void *userdata, char c) {
-  if (client.connected())
-    client.write(c);
+  wifi_client_write(c);
 }
 
 static void onerror(fe_Context *ctx, const char *msg, fe_Object *cl) {

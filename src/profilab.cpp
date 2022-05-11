@@ -1,4 +1,5 @@
 #include "profilab.h"
+#include "log.h"
 
 static AsyncUDP udp;
 
@@ -25,7 +26,8 @@ void ProfilabClass::begin() {
         for (int i = 0; i < 16; i++) {
           if ((changed & (1 << i)) && callbacks[i] != nullptr) {
             bool bitval = (data & (1 << i)) > 0;
-            Serial.printf("RX pin%d: %d\n", i, bitval);
+            Serial.printf("rx[%d]=%d\n", i, bitval);
+            LOG("rx[%d]=%d\n", i, bitval);
             callbacks[i](bitval);
           }
         }
@@ -40,7 +42,8 @@ void ProfilabClass::tx(uint8_t pin, bool val) {
   uint16_t old_output = output, mask = ~(1 << pin);
   output = (output & mask) | (val << pin);
   if (output != old_output && flag) {
-    Serial.printf("TX pin%d: %d\n", pin, val);
+    Serial.printf("tx[%d]=%d\n", pin, val);
+    LOG("tx[%d]=%d\n", pin, val);
     udp.writeTo((const uint8_t *)&output, 2, remoteIP, remotePort);
   }
   xSemaphoreGive(tx_mutex);
