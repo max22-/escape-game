@@ -8,11 +8,11 @@
 
 static void light_task(void *params) {
   Light.set_level(90);
-  Light.set_level(60, 180);
+  /*Light.set_level(60, 180);
   Light.set_level(80, 180);
   Light.set_level(50, 180);
   Light.set_level(90, 180);
-  Light.set_level(40, 180);
+  Light.set_level(40, 180);*/
 
   while (true)
     delay(1000);
