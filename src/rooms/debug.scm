@@ -1,19 +1,33 @@
 (display "hello")
 
-(sensor-max 0 2000)
+(= d 10000)
 
-(= d 2000)
+(sensor-max 0 d)
 
 (do
     (= i 0)
     (while (< i 7)
 	   (display "Capteur ")
 	   (display i)
-	   (display "min")
-	   (display (sensor-min i d))
+	   (display "max")
+	   (display (sensor-max i d))
 	   (display "")
 	   (= i (+ i 1))))
 
 
+(do
+    (= i 0)
+    (while (< i 7)
+	   (display "Capteur ")
+	   (display i)
+     	   (display (sensor i))
+	   (display "")
+	   (= i (+ i 1))))
 
 (restart)
+
+(do
+    (= ts (millis))
+    (while (< (millis) (+ ts 10000))
+	   (display (sensor 0))))
+	      
