@@ -11,7 +11,7 @@ public:
 
   bool define(char *name, float value);
 
-  uint16_t threshold();
+  uint16_t thresholds(uint8_t i);
   float night();
   float day();
   float delay1();
@@ -29,7 +29,7 @@ private:
   Preferences preferences;
   std::unordered_map<std::string, float *> parameters;
 
-  float _threshold, _night, _day, _delay1, _delay2;
+  float _thresholds[7], _night, _day, _delay1, _delay2;
 #ifdef SALLE_AUTOMNE
   float _chest_delay_1;
   float _chest_delay_2;

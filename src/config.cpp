@@ -3,7 +3,13 @@
 
 ConfigClass::ConfigClass() {
   parameters = {
-      {"seuil", &_threshold},
+      {"seuil0", &_thresholds[0]},
+      {"seuil1", &_thresholds[1]},
+      {"seuil2", &_thresholds[2]},
+      {"seuil3", &_thresholds[3]},
+      {"seuil4", &_thresholds[4]},
+      {"seuil5", &_thresholds[5]},
+      {"seuil6", &_thresholds[6]},
 #ifdef SALLE_AUTOMNE
       {"tempo_coffre_1", &_chest_delay_1},
       {"tempo_coffre_2", &_chest_delay_2},
@@ -59,7 +65,7 @@ float ConfigClass::chest_delay_2() { return _chest_delay_2; }
 float ConfigClass::night() { return _night; }
 float ConfigClass::day() { return _day; }
 #endif
-uint16_t ConfigClass::threshold() { return _threshold; }
+uint16_t ConfigClass::thresholds(uint8_t i) { return _thresholds[i]; }
 float ConfigClass::delay1() { return _delay1; }
 float ConfigClass::delay2() { return _delay2; }
 

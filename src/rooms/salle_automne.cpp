@@ -107,7 +107,7 @@ void room_init() {
 }
 
 void room_handle() {
-  Profilab.tx(0, Sensors.read(0) > Config.threshold());
+  Profilab.tx(0, Sensors.read(0) > Config.thresholds(0));
   Profilab.tx(10, digitalRead(button) == LOW);
 }
 

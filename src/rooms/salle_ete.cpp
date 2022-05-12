@@ -54,7 +54,7 @@ void room_init() {
 
 void room_handle() {
   for (int i = 0; i < 7; i++)
-    Profilab.tx(i, Sensors.read(i) > Config.threshold());
+    Profilab.tx(i, Sensors.read(i) > Config.thresholds(i));
 
   for (int i = 0; i < sizeof(buttons); i++)
     Profilab.tx(10 + i, digitalRead(buttons[i]) == LOW);
