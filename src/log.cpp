@@ -8,8 +8,10 @@ void _log(const char *fmt, ...)
 {
     char buffer[256];
     va_list args;
-    va_start(args, fmt);
-    vsnprintf(buffer, sizeof(buffer), fmt, args);
-    wifi_client_write(buffer);
-    va_end(args);
+    if(log_enabled) {
+        va_start(args, fmt);
+        vsnprintf(buffer, sizeof(buffer), fmt, args);
+        wifi_client_write(buffer);
+        va_end(args);
+    }
 }
