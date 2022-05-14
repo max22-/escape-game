@@ -24,7 +24,7 @@ static void light_task_2(void *params) {
 
 static void light_task_set_night(void *params) {
   Light.set_level(Config.night());
-  while(true)
+  while (true)
     delay(1000);
 }
 

@@ -18,18 +18,16 @@ static fe_Object *obj;
 static void repl_task(void *);
 static SemaphoreHandle_t client_mutex;
 
-void wifi_client_write(const char *s)
-{
+void wifi_client_write(const char *s) {
   xSemaphoreTake(client_mutex, portMAX_DELAY);
-  if(client.connected())
+  if (client.connected())
     client.write(s);
   xSemaphoreGive(client_mutex);
 }
 
-void wifi_client_write(char c)
-{
+void wifi_client_write(char c) {
   xSemaphoreTake(client_mutex, portMAX_DELAY);
-  if(client.connected())
+  if (client.connected())
     client.write(c);
   xSemaphoreGive(client_mutex);
 }
@@ -51,16 +49,16 @@ void fe_end() {
 
 static char readwifi(fe_Context *ctx, void *userdata) {
   char c;
-  while(true) {
+  while (true) {
     xSemaphoreTake(client_mutex, portMAX_DELAY);
-    if(!client.connected() || client.available() > 0)
+    if (!client.connected() || client.available() > 0)
       break;
     xSemaphoreGive(client_mutex);
     delay(100);
   }
   if (!client.connected())
     c = 0;
-  else 
+  else
     c = client.read();
   xSemaphoreGive(client_mutex);
   return c;
@@ -86,9 +84,7 @@ static void repl_task(void *) {
       while (client.connected()) {
         client.print("> ");
         obj = fe_read(ctx, readwifi, nullptr);
-        if (!obj) {
-          break;
-        }
+        if (!obj) break;
         obj = fe_eval(ctx, obj);
         fe_write(ctx, obj, writewifi, nullptr, 0);
         client.println();

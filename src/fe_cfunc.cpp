@@ -1,16 +1,17 @@
 #include "fe_cfunc.h"
+#include "config.h"
 #include "fe_repl.h"
 #include "log.h"
-#include "config.h"
 #include "pin_config.h"
 #include "sensor.h"
-#include <nvs_flash.h>
 #include <WiFi.h>
+#include <nvs_flash.h>
 
 static fe_Object *cfunc_display(fe_Context *ctx, fe_Object *arg) {
   char buf[64];
   fe_tostring(ctx, fe_nextarg(ctx, &arg), buf, sizeof(buf));
-  buf[60] = buf[61] = buf[62]= '.'; /* if the string is too long, we display '...' at the end */
+  buf[60] = buf[61] = buf[62] =
+      '.'; /* if the string is too long, we display '...' at the end */
   buf[63] = 0;
   wifi_client_write(buf);
   wifi_client_write("\n");
@@ -83,7 +84,7 @@ static fe_Object *cfunc_sensor_max(fe_Context *ctx, fe_Object *arg) {
     return fe_bool(ctx, 0);
   }
   ts = millis();
-  while(millis() - ts <= ms)
+  while (millis() - ts <= ms)
     res = max(res, Sensors.read(n));
   return fe_number(ctx, res);
 }
@@ -98,12 +99,10 @@ static fe_Object *cfunc_sensor_min(fe_Context *ctx, fe_Object *arg) {
     return fe_bool(ctx, 0);
   }
   ts = millis();
-  while(millis() - ts <= ms)
+  while (millis() - ts <= ms)
     res = min(res, Sensors.read(n));
   return fe_number(ctx, res);
 }
-
-
 
 static fe_Object *cfunc_config(fe_Context *ctx, fe_Object *arg) {
   char name[256];
@@ -178,12 +177,9 @@ void fe_register_cfuncs(fe_Context *ctx) {
   fe_set(ctx, fe_symbol(ctx, "pinMode"), fe_cfunc(ctx, cfunc_pinMode));
   fe_set(ctx, fe_symbol(ctx, "digitalWrite"),
          fe_cfunc(ctx, cfunc_digitalWrite));
-  fe_set(ctx, fe_symbol(ctx, "digitalRead"),
-         fe_cfunc(ctx, cfunc_digitalRead));
-  fe_set(ctx, fe_symbol(ctx, "log-enable"),
-         fe_cfunc(ctx, cfunc_log_enable));
-  fe_set(ctx, fe_symbol(ctx, "log-disable"),
-         fe_cfunc(ctx, cfunc_log_disable));
+  fe_set(ctx, fe_symbol(ctx, "digitalRead"), fe_cfunc(ctx, cfunc_digitalRead));
+  fe_set(ctx, fe_symbol(ctx, "log-enable"), fe_cfunc(ctx, cfunc_log_enable));
+  fe_set(ctx, fe_symbol(ctx, "log-disable"), fe_cfunc(ctx, cfunc_log_disable));
 
   /* Config */
 

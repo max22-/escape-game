@@ -24,26 +24,23 @@ static void light_task_2(void *params) {
 
 static void light_task_set_day(void *params) {
   Light.set_level(Config.day());
-  while(true)
+  while (true)
     delay(1000);
 }
 
 xTaskHandle chest_task_handle = NULL;
 
-void open_chest()
-{
+void open_chest() {
   digitalWrite(CHEST_RELAY_1, LOW);
   digitalWrite(CHEST_RELAY_2, HIGH);
 }
 
-void close_chest()
-{
+void close_chest() {
   digitalWrite(CHEST_RELAY_1, HIGH);
   digitalWrite(CHEST_RELAY_2, LOW);
 }
 
-void stop_chest()
-{
+void stop_chest() {
   digitalWrite(CHEST_RELAY_1, LOW);
   digitalWrite(CHEST_RELAY_2, LOW);
 }
@@ -52,11 +49,11 @@ static void chest_task(void *params) {
   Serial.printf("delay 1 = %d\n", (int)Config.chest_delay_1());
   Serial.printf("delay 2 = %d\n", (int)Config.chest_delay_2());
   open_chest();
-  delay(Config.chest_delay_1()*1000);
+  delay(Config.chest_delay_1() * 1000);
   stop_chest();
-  delay(Config.chest_delay_2()*1000);
+  delay(Config.chest_delay_2() * 1000);
   close_chest();
-  delay(Config.chest_delay_1()*1000);
+  delay(Config.chest_delay_1() * 1000);
   stop_chest();
   chest_task_handle = NULL;
   vTaskDelete(NULL);
@@ -64,7 +61,7 @@ static void chest_task(void *params) {
 
 static void chest_manual_task(void *params) {
   close_chest();
-  delay(Config.chest_delay_1()*1000); 
+  delay(Config.chest_delay_1() * 1000);
   chest_task_handle = NULL;
   vTaskDelete(NULL);
 }
@@ -83,9 +80,10 @@ void room_init() {
   });
   Profilab.rx(7, [](bool val) { digitalWrite(DOOR_RELAY, val ? HIGH : LOW); });
   Profilab.rx(8, [](bool val) {
-    if(chest_task_handle != NULL)
+    if (chest_task_handle != NULL)
       vTaskDelete(chest_task_handle);
-    xTaskCreate(chest_manual_task, "chest_manual_task", 3000, NULL, 1, &chest_task_handle);
+    xTaskCreate(chest_manual_task, "chest_manual_task", 3000, NULL, 1,
+                &chest_task_handle);
   });
   Profilab.rx(9, [](bool val) {
     if (val) {
@@ -99,11 +97,11 @@ void room_init() {
       Light.run_task(light_task_2);
     }
   });
-  Profilab.rx(11, [](bool val) { 
-    if(chest_task_handle != NULL)
+  Profilab.rx(11, [](bool val) {
+    if (chest_task_handle != NULL)
       vTaskDelete(chest_task_handle);
-    xTaskCreate(chest_task, "chest_task", 3000, NULL, 1, &chest_task_handle); }
-  );
+    xTaskCreate(chest_task, "chest_task", 3000, NULL, 1, &chest_task_handle);
+  });
 }
 
 void room_handle() {

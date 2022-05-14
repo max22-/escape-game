@@ -19,8 +19,6 @@ void room_init() {
   }*/
 }
 
-void room_handle() {
-  delay(10);
-}
+void room_handle() { delay(10); }
 
 #endif
