@@ -31,3 +31,11 @@
     (while (< (millis) (+ ts 10000))
 	   (display (sensor 0))))
 	      
+(config "seuil0" 700)
+(config "seuil1" 700)
+(config "seuil2" 700)
+(config "seuil3" 700)
+(config "seuil4" 700)
+(config "seuil5" 700)
+(config "seuil6" 700)
+
