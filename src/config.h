@@ -43,7 +43,7 @@ extern ConfigClass Config;
 
 #define IP_1 192
 #define IP_2 168
-#define IP_3 0
+#define IP_3 10
 
 #if defined(SALLE_ETE)
 #define IP_4 210
@@ -61,7 +61,10 @@ extern ConfigClass Config;
 
 #define SOFT_AP_PASSWORD "eogheog6f6z"
 
-#define WIFI_SSID "ARMORSTUDIO"
-#define WIFI_PASSWORD "1234554321"
+#define WIFI_SSID "Server"
+#define WIFI_PASSWORD "PoIuYtReZa9876543210"
+
+#define BUTTON_FILTER_DELAY 50000 /* us */
+#define FILTER_COEFF 0.5
 
 #endif

@@ -5,8 +5,22 @@
 #include "pin_config.h"
 #include "rooms.h"
 #include "sensor.h"
+#include "button.h"
 
-const uint8_t buttons[] = {23, 35, 34, 39, IO3, IO4, IO5};
+Button buttons[] = {
+  Button(23), Button(35), Button(34),
+  Button(39), Button(IO3), Button(IO4), Button(IO5)
+};
+
+Filter filtered_buttons[] = {
+  Filter(buttons[0], BUTTON_FILTER_DELAY, FILTER_COEFF),
+  Filter(buttons[1], BUTTON_FILTER_DELAY, FILTER_COEFF),
+  Filter(buttons[2], BUTTON_FILTER_DELAY, FILTER_COEFF),
+  Filter(buttons[3], BUTTON_FILTER_DELAY, FILTER_COEFF),
+  Filter(buttons[4], BUTTON_FILTER_DELAY, FILTER_COEFF),
+  Filter(buttons[5], BUTTON_FILTER_DELAY, FILTER_COEFF),
+  Filter(buttons[6], BUTTON_FILTER_DELAY, FILTER_COEFF)
+};
 
 static void light_task_1(void *params) {
   Light.set_level(Config.night());
@@ -29,8 +43,8 @@ static void light_task_3(void *params) {
 }
 
 void room_init() {
-  for (int i = 0; i < sizeof(buttons); i++)
-    pinMode(buttons[i], INPUT_PULLUP);
+  for (int i = 0; i < sizeof(buttons)/sizeof(buttons[0]); i++)
+    buttons[i].begin();
   pinMode(DOOR_RELAY, OUTPUT);
   pinMode(LEDS_RELAY, OUTPUT);
   pinMode(LASER, OUTPUT);
@@ -55,8 +69,8 @@ void room_init() {
 }
 
 void room_handle() {
-  for (int i = 0; i < sizeof(buttons); i++)
-    Profilab.tx(1 + i, digitalRead(buttons[i]) == LOW);
+  for (int i = 0; i < sizeof(buttons)/sizeof(buttons[0]); i++)
+    Profilab.tx(1 + i, filtered_buttons[i].output() < 0.05);
 }
 
 #endif

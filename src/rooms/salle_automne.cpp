@@ -5,8 +5,10 @@
 #include "pin_config.h"
 #include "rooms.h"
 #include "sensor.h"
+#include "button.h"
 
-const uint8_t button = 35;
+Button button(35);
+Filter filtered_button(button, BUTTON_FILTER_DELAY /* us */, FILTER_COEFF);
 
 static void light_task_1(void *params) {
   Light.set_level(Config.day());
@@ -67,7 +69,7 @@ static void chest_manual_task(void *params) {
 }
 
 void room_init() {
-  pinMode(button, INPUT_PULLUP);
+  button.begin();
   pinMode(DOOR_RELAY, OUTPUT);
   pinMode(CHEST_RELAY_1, OUTPUT);
   pinMode(CHEST_RELAY_2, OUTPUT);
@@ -106,7 +108,7 @@ void room_init() {
 
 void room_handle() {
   Profilab.tx(0, Sensors.read(0) > Config.thresholds(0));
-  Profilab.tx(10, digitalRead(button) == LOW);
+  Profilab.tx(10, filtered_button.output() < 0.05);
 }
 
 #endif
