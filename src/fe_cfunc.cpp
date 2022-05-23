@@ -104,6 +104,22 @@ static fe_Object *cfunc_sensor_min(fe_Context *ctx, fe_Object *arg) {
   return fe_number(ctx, res);
 }
 
+static fe_Object *cfunc_sensors_plot(fe_Context *ctx, fe_Object *arg) {
+  uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  unsigned long ts;
+  ts = millis();
+  while (millis() - ts <= ms) {
+    Serial.print("/*");
+    for(int i = 0; i < 7; i++) {
+      Serial.printf("%d", Sensors.read(i));
+      if(i != 6)
+        Serial.print(",");
+    }
+    Serial.println("*/");
+  }
+  return fe_bool(ctx, 0);
+}
+
 static fe_Object *cfunc_config(fe_Context *ctx, fe_Object *arg) {
   char name[256];
   float value;
@@ -186,6 +202,7 @@ void fe_register_cfuncs(fe_Context *ctx) {
   fe_set(ctx, fe_symbol(ctx, "sensor"), fe_cfunc(ctx, cfunc_sensor));
   fe_set(ctx, fe_symbol(ctx, "sensor-max"), fe_cfunc(ctx, cfunc_sensor_max));
   fe_set(ctx, fe_symbol(ctx, "sensor-min"), fe_cfunc(ctx, cfunc_sensor_min));
+  fe_set(ctx, fe_symbol(ctx, "sensors-plot"), fe_cfunc(ctx, cfunc_sensors_plot));
   fe_set(ctx, fe_symbol(ctx, "config"), fe_cfunc(ctx, cfunc_config));
 
   /**********/
