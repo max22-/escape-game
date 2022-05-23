@@ -50,12 +50,16 @@ void stop_chest() {
 static void chest_task(void *params) {
   Serial.printf("delay 1 = %d\n", (int)Config.chest_delay_1());
   Serial.printf("delay 2 = %d\n", (int)Config.chest_delay_2());
+  Serial.println("open_chest");
   open_chest();
   delay(Config.chest_delay_1() * 1000);
+  Serial.println("stop chest");
   stop_chest();
   delay(Config.chest_delay_2() * 1000);
+  Serial.println("close chest");
   close_chest();
   delay(Config.chest_delay_1() * 1000);
+  Serial.println("stop chest");
   stop_chest();
   chest_task_handle = NULL;
   vTaskDelete(NULL);
