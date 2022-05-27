@@ -10,6 +10,8 @@
 Button button(35);
 Filter filtered_button(button, BUTTON_FILTER_DELAY /* us */, FILTER_COEFF);
 
+Sensor sensor(0);
+
 static void light_task_1(void *params) {
   Light.set_level(Config.day());
   Light.set_level(Config.night(), Config.delay1());
@@ -77,7 +79,7 @@ void room_init() {
   pinMode(DOOR_RELAY, OUTPUT);
   pinMode(CHEST_RELAY_1, OUTPUT);
   pinMode(CHEST_RELAY_2, OUTPUT);
-  Sensors.begin();
+  Sensor::begin();
   Light.begin();
   Light.set_level(Config.day());
   Profilab.rx(4, [](bool val) {
@@ -111,7 +113,7 @@ void room_init() {
 }
 
 void room_handle() {
-  Profilab.tx(0, Sensors.read(0) > Config.thresholds(0));
+  Profilab.tx(0, sensor.output() > Config.thresholds(0));
   Profilab.tx(10, filtered_button.output() < 0.05);
 }
 
