@@ -1,7 +1,10 @@
+#include <Arduino.h>
 #include "sensor.h"
 #include "pin_config.h"
 
-void SensorsClass::begin() {
+Sensor::Sensor(uint8_t number) : number(number) {}
+
+void Sensor::begin() {
   pinMode(SENSORS_TRIGGER, OUTPUT);
   pinMode(SENSORS_DATA, INPUT);
   pinMode(S0, OUTPUT);
@@ -9,10 +12,10 @@ void SensorsClass::begin() {
   pinMode(S2, OUTPUT);
 }
 
-uint16_t SensorsClass::read(uint8_t sensor_number) {
-  const uint8_t s0 = sensor_number & 1 ? HIGH : LOW;
-  const uint8_t s1 = sensor_number & 2 ? HIGH : LOW;
-  const uint8_t s2 = sensor_number & 4 ? HIGH : LOW;
+float Sensor::output() {
+  const uint8_t s0 = number & 1 ? HIGH : LOW;
+  const uint8_t s1 = number & 2 ? HIGH : LOW;
+  const uint8_t s2 = number & 4 ? HIGH : LOW;
   digitalWrite(S0, s0);
   digitalWrite(S1, s1);
   digitalWrite(S2, s2);
@@ -30,7 +33,3 @@ uint16_t SensorsClass::read(uint8_t sensor_number) {
   // v1, v2, abs(v2-v1));
   return abs(v2 - v1);
 }
-
-SensorsClass::SensorsClass() {}
-
-SensorsClass Sensors;

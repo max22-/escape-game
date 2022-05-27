@@ -65,6 +65,7 @@ extern ConfigClass Config;
 #define WIFI_PASSWORD "1234554321"
 
 #define BUTTON_FILTER_DELAY 50000 /* us */
+#define SENSOR_FILTER_DELAY 50000 /* us */
 #define FILTER_COEFF 0.5
 
 #endif

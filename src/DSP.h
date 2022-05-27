@@ -1,3 +1,6 @@
+#ifndef DSP_H
+#define DSP_H
+
 #include <stdint.h>
 
 class DSP {
@@ -17,3 +20,5 @@ private:
   float prev_micros, y;
   bool started = false;
 };
+
+#endif

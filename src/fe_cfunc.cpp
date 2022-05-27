@@ -71,47 +71,40 @@ static fe_Object *cfunc_sensor(fe_Context *ctx, fe_Object *arg) {
     fe_error(ctx, "Invalid sensor number");
     return fe_bool(ctx, 0);
   }
-  return fe_number(ctx, Sensors.read(n));
+  Sensor::begin();
+  Sensor sensor(n);
+  return fe_number(ctx, sensor.output());
 }
 
 static fe_Object *cfunc_sensor_max(fe_Context *ctx, fe_Object *arg) {
   uint8_t n = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
   uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
-  uint16_t res = 0;
+  float res = 0;
   unsigned long ts;
   if (n > 7) {
     fe_error(ctx, "Invalid sensor number");
     return fe_bool(ctx, 0);
   }
+  Sensor::begin();
+  Sensor sensor(n);
   ts = millis();
   while (millis() - ts <= ms)
-    res = max(res, Sensors.read(n));
-  return fe_number(ctx, res);
-}
-
-static fe_Object *cfunc_sensor_min(fe_Context *ctx, fe_Object *arg) {
-  uint8_t n = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
-  uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
-  uint16_t res = 4095;
-  unsigned long ts;
-  if (n > 7) {
-    fe_error(ctx, "Invalid sensor number");
-    return fe_bool(ctx, 0);
-  }
-  ts = millis();
-  while (millis() - ts <= ms)
-    res = min(res, Sensors.read(n));
+    res = max(res, sensor.output());
   return fe_number(ctx, res);
 }
 
 static fe_Object *cfunc_sensors_plot(fe_Context *ctx, fe_Object *arg) {
   uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
   unsigned long ts;
+  Sensor sensors[] = {
+    Sensor(0), Sensor(1), Sensor(2), Sensor(3),
+    Sensor(4), Sensor(5), Sensor(6), Sensor(7)
+  };
   ts = millis();
   while (millis() - ts <= ms) {
     Serial.print("/*");
     for(int i = 0; i < 7; i++) {
-      Serial.printf("%d", Sensors.read(i));
+      Serial.printf("%f", sensors[i].output());
       if(i != 6)
         Serial.print(",");
     }
@@ -201,7 +194,6 @@ void fe_register_cfuncs(fe_Context *ctx) {
 
   fe_set(ctx, fe_symbol(ctx, "sensor"), fe_cfunc(ctx, cfunc_sensor));
   fe_set(ctx, fe_symbol(ctx, "sensor-max"), fe_cfunc(ctx, cfunc_sensor_max));
-  fe_set(ctx, fe_symbol(ctx, "sensor-min"), fe_cfunc(ctx, cfunc_sensor_min));
   fe_set(ctx, fe_symbol(ctx, "sensors-plot"), fe_cfunc(ctx, cfunc_sensors_plot));
   fe_set(ctx, fe_symbol(ctx, "config"), fe_cfunc(ctx, cfunc_config));
 

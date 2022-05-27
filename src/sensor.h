@@ -1,19 +1,12 @@
-#ifndef SENSOR_H
-#define SENSOR_H
+#include "DSP.h"
 
-#include <Arduino.h>
-
-class SensorsClass {
+class Sensor : public DSP {
 public:
-  SensorsClass();
-  void begin();
-  uint16_t read(uint8_t sensor_number);
+  Sensor(uint8_t number);
+  static void begin();
+  float output() override;
 
 private:
-  SensorsClass(const SensorsClass &) = delete;
-  SensorsClass &operator=(const SensorsClass &) = delete;
+  const uint8_t number;
 };
 
-extern SensorsClass Sensors;
-
-#endif

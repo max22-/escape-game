@@ -7,7 +7,7 @@
 #include "sensor.h"
 
 void room_init() {
-  Sensors.begin();
+  Sensor::begin();
 }
 
 void room_handle() { delay(10); }
