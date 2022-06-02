@@ -22,29 +22,13 @@ Filter filtered_sensors[] = {
   Filter(sensors[7], SENSOR_FILTER_DELAY, FILTER_COEFF),
 };
 
-static void light_task(void *params) {
-  Light.set_level(90);
-  /*Light.set_level(60, 180);
-  Light.set_level(80, 180);
-  Light.set_level(50, 180);
-  Light.set_level(90, 180);
-  Light.set_level(40, 180);*/
-
-  while (true)
-    delay(1000);
-}
-
 void room_init() {
   pinMode(DOOR_RELAY, OUTPUT);
   pinMode(HOT_PLATE, OUTPUT);
   pinMode(SPOT, OUTPUT);
   Sensor::begin();
   Light.begin();
-  Light.set_level(80);
-  Profilab.rx(0, [](bool val) {
-    if (val)
-      Light.run_task(light_task);
-  });
+  Light.set_level(90);
   Profilab.rx(6, [](bool val) { digitalWrite(SPOT, val ? HIGH : LOW); });
   Profilab.rx(7, [](bool val) { digitalWrite(DOOR_RELAY, val ? HIGH : LOW); });
   Profilab.rx(8, [](bool val) { digitalWrite(HOT_PLATE, val ? HIGH : LOW); });
