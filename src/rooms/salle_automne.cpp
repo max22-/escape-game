@@ -10,7 +10,39 @@
 Button button(35);
 Filter filtered_button(button, BUTTON_FILTER_DELAY /* us */, FILTER_COEFF);
 
-Sensor sensor(0);
+static SemaphoreHandle_t mutex;
+static int sensor_value = 0;
+#define SENSOR_MIN_DURATION 3000 // us
+
+
+void sensor_task(void *params)
+{
+  uint16_t threshold = Config.thresholds(0);
+  pinMode(SENSORS_DATA, INPUT);
+  pinMode(S0, OUTPUT);
+  pinMode(S1, OUTPUT);
+  pinMode(S2, OUTPUT);
+  digitalWrite(S0, 0);
+  digitalWrite(S1, 0);
+  digitalWrite(S2, 0);
+  while(true) {
+    if(analogRead(SENSORS_DATA) < threshold) {
+      unsigned long timestamp = micros();
+      while(analogRead(SENSORS_DATA) < threshold);
+      if(micros() - timestamp >= SENSOR_MIN_DURATION) {
+        xSemaphoreTake(mutex, portMAX_DELAY);
+        sensor_value = 1;
+        xSemaphoreGive(mutex);
+        delay(2000);
+        xSemaphoreTake(mutex, portMAX_DELAY);
+        sensor_value = 0;
+        xSemaphoreGive(mutex);
+      }
+
+    }
+    delay(1);
+  }
+}
 
 static void light_task_1(void *params) {
   Light.set_level(Config.day());
@@ -79,7 +111,8 @@ void room_init() {
   pinMode(DOOR_RELAY, OUTPUT);
   pinMode(CHEST_RELAY_1, OUTPUT);
   pinMode(CHEST_RELAY_2, OUTPUT);
-  Sensor::begin();
+  mutex = xSemaphoreCreateMutex();
+  xTaskCreate(sensor_task, "sensor_task", 3000, NULL, 1, &chest_task_handle);
   Light.begin();
   Light.set_level(Config.day());
   Profilab.rx(4, [](bool val) {
@@ -113,7 +146,9 @@ void room_init() {
 }
 
 void room_handle() {
-  Profilab.tx(0, sensor.output() > Config.thresholds(0));
+  xSemaphoreTake(mutex, 5 / portTICK_PERIOD_MS);
+  Profilab.tx(0, sensor_value);
+  xSemaphoreGive(mutex);
   Profilab.tx(10, filtered_button.output() < 0.05);
 }
 
