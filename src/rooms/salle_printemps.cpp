@@ -42,6 +42,16 @@ static void light_task_3(void *params) {
     delay(1000);
 }
 
+static xTaskHandle door_task_handle = NULL;
+
+static void door_task(void *params) {
+  digitalWrite(DOOR_RELAY, HIGH);
+  delay(Config.door_delay() * 1000);
+  digitalWrite(DOOR_RELAY, LOW);
+  door_task_handle = NULL;
+  vTaskDelete(NULL);
+}
+
 void room_init() {
   for (int i = 0; i < sizeof(buttons)/sizeof(buttons[0]); i++)
     buttons[i].begin();
@@ -63,7 +73,14 @@ void room_init() {
     if (val)
       Light.run_task(light_task_3);
   });
-  Profilab.rx(7, [](bool val) { digitalWrite(DOOR_RELAY, val ? HIGH : LOW); });
+  Profilab.rx(7, [](bool val) {
+    if(val) { 
+      if(door_task_handle != NULL)
+        vTaskDelete(door_task_handle);
+      xTaskCreate(door_task, "door_task", 3000, NULL, 1,
+                  &door_task_handle);
+     }
+  });
   Profilab.rx(12, [](bool val) { digitalWrite(LEDS_RELAY, val ? HIGH : LOW); });
   Profilab.rx(14, [](bool val) { digitalWrite(LASER, val ? HIGH : LOW); });
 }
