@@ -129,13 +129,14 @@ void room_init() {
     if (val)
       Light.run_task(light_task_set_day);
   });
-  Profilab.rx(7, [](bool val) { 
-    if(door_task_handle != NULL)
-      vTaskDelete(door_task_handle);
+  Profilab.rx(7, [](bool val) {
+    if(val) { 
+      if(door_task_handle != NULL)
+        vTaskDelete(door_task_handle);
       xTaskCreate(door_task, "door_task", 3000, NULL, 1,
-                &door_task_handle);
+                  &door_task_handle);
      }
-  );
+  });
   Profilab.rx(8, [](bool val) {
     if (chest_task_handle != NULL)
       vTaskDelete(chest_task_handle);
