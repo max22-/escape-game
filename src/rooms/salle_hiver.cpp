@@ -22,6 +22,16 @@ Filter filtered_sensors[] = {
   Filter(sensors[7], SENSOR_FILTER_DELAY, FILTER_COEFF),
 };
 
+static xTaskHandle door_task_handle = NULL;
+
+static void door_task(void *params) {
+  digitalWrite(DOOR_RELAY, HIGH);
+  delay(Config.door_delay() * 1000);
+  digitalWrite(DOOR_RELAY, LOW);
+  door_task_handle = NULL;
+  vTaskDelete(NULL);
+}
+  
 void room_init() {
   pinMode(DOOR_RELAY, OUTPUT);
   pinMode(HOT_PLATE, OUTPUT);
@@ -30,7 +40,14 @@ void room_init() {
   Light.begin();
   Light.set_level(90);
   Profilab.rx(6, [](bool val) { digitalWrite(SPOT, val ? HIGH : LOW); });
-  Profilab.rx(7, [](bool val) { digitalWrite(DOOR_RELAY, val ? HIGH : LOW); });
+  Profilab.rx(7, [](bool val) {
+    if(val) { 
+      if(door_task_handle != NULL)
+        vTaskDelete(door_task_handle);
+      xTaskCreate(door_task, "door_task", 3000, NULL, 1,
+                  &door_task_handle);
+    }
+  });
   Profilab.rx(8, [](bool val) { digitalWrite(HOT_PLATE, val ? HIGH : LOW); });
 }
 
