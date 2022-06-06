@@ -64,7 +64,7 @@ static void light_task_set_day(void *params) {
     delay(1000);
 }
 
-xTaskHandle chest_task_handle = NULL;
+static xTaskHandle chest_task_handle = NULL;
 
 void open_chest() {
   digitalWrite(CHEST_RELAY_1, LOW);
@@ -106,6 +106,16 @@ static void chest_manual_task(void *params) {
   vTaskDelete(NULL);
 }
 
+static xTaskHandle door_task_handle = NULL;
+
+static void door_task(void *params) {
+  digitalWrite(DOOR_RELAY, HIGH);
+  delay(Config.door_delay() * 1000);
+  digitalWrite(DOOR_RELAY, LOW);
+  door_task_handle = NULL;
+  vTaskDelete(NULL);
+}
+
 void room_init() {
   button.begin();
   pinMode(DOOR_RELAY, OUTPUT);
@@ -119,7 +129,13 @@ void room_init() {
     if (val)
       Light.run_task(light_task_set_day);
   });
-  Profilab.rx(7, [](bool val) { digitalWrite(DOOR_RELAY, val ? HIGH : LOW); });
+  Profilab.rx(7, [](bool val) { 
+    if(door_task_handle != NULL)
+      vTaskDelete(door_task_handle);
+      xTaskCreate(door_task, "door_task", 3000, NULL, 1,
+                &door_task_handle);
+     }
+  );
   Profilab.rx(8, [](bool val) {
     if (chest_task_handle != NULL)
       vTaskDelete(chest_task_handle);

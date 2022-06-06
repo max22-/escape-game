@@ -10,6 +10,7 @@ ConfigClass::ConfigClass() {
       {"seuil4", &_thresholds[4]},
       {"seuil5", &_thresholds[5]},
       {"seuil6", &_thresholds[6]},
+      {"tempo_porte", &_door_delay},
 #ifdef SALLE_AUTOMNE
       {"tempo_coffre_1", &_chest_delay_1},
       {"tempo_coffre_2", &_chest_delay_2},
@@ -68,5 +69,6 @@ float ConfigClass::day() { return _day; }
 uint16_t ConfigClass::thresholds(uint8_t i) { return _thresholds[i]; }
 float ConfigClass::delay1() { return _delay1; }
 float ConfigClass::delay2() { return _delay2; }
+float ConfigClass::door_delay() { return _door_delay; }
 
 ConfigClass Config;
