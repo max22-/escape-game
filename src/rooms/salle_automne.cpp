@@ -122,7 +122,7 @@ void room_init() {
   pinMode(CHEST_RELAY_1, OUTPUT);
   pinMode(CHEST_RELAY_2, OUTPUT);
   mutex = xSemaphoreCreateMutex();
-  xTaskCreate(sensor_task, "sensor_task", 3000, NULL, 1, &chest_task_handle);
+  xTaskCreate(sensor_task, "sensor_task", 3000, NULL, 1, NULL);
   Light.begin();
   Light.set_level(Config.day());
   Profilab.rx(4, [](bool val) {
