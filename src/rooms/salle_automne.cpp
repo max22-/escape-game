@@ -151,7 +151,7 @@ void room_init() {
   });
   Profilab.rx(10, [](bool val) {
     if (val) {
-      Serial.println("Starting light task 1");
+      Serial.println("Starting light task 2");
       Light.run_task(light_task_2);
     }
   });
