@@ -102,6 +102,7 @@ static void chest_task(void *params) {
 static void chest_manual_task(void *params) {
   close_chest();
   delay(Config.chest_delay_1() * 1000);
+  stop_chest();
   chest_task_handle = NULL;
   vTaskDelete(NULL);
 }
