@@ -93,6 +93,28 @@ static fe_Object *cfunc_sensor_max(fe_Context *ctx, fe_Object *arg) {
   return fe_number(ctx, res);
 }
 
+static fe_Object *cfunc_ball_sensor_min(fe_Context *ctx, fe_Object *arg) {
+  uint8_t n = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
+  float res = 4096;
+  unsigned long ts;
+  if (n > 7) {
+    fe_error(ctx, "Invalid sensor number");
+    return fe_bool(ctx, 0);
+  }
+  pinMode(SENSORS_DATA, INPUT);
+  pinMode(S0, OUTPUT);
+  pinMode(S1, OUTPUT);
+  pinMode(S2, OUTPUT);
+  digitalWrite(S0, 0);
+  digitalWrite(S1, 0);
+  digitalWrite(S2, 0);
+  ts = millis();
+  while (millis() - ts <= ms)
+    res = min(res, (float)analogRead(SENSORS_DATA));
+  return fe_number(ctx, res);
+}
+
 static fe_Object *cfunc_sensors_plot(fe_Context *ctx, fe_Object *arg) {
   uint32_t ms = fe_tonumber(ctx, fe_nextarg(ctx, &arg));
   unsigned long ts;
@@ -194,6 +216,7 @@ void fe_register_cfuncs(fe_Context *ctx) {
 
   fe_set(ctx, fe_symbol(ctx, "sensor"), fe_cfunc(ctx, cfunc_sensor));
   fe_set(ctx, fe_symbol(ctx, "sensor-max"), fe_cfunc(ctx, cfunc_sensor_max));
+  fe_set(ctx, fe_symbol(ctx, "ball-sensor-min"), fe_cfunc(ctx, cfunc_ball_sensor_min));
   fe_set(ctx, fe_symbol(ctx, "sensors-plot"), fe_cfunc(ctx, cfunc_sensors_plot));
   fe_set(ctx, fe_symbol(ctx, "config"), fe_cfunc(ctx, cfunc_config));
 
