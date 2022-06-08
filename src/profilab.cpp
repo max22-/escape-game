@@ -43,7 +43,9 @@ void ProfilabClass::tx(uint8_t pin, bool val) {
   output = (output & mask) | (val << pin);
   if (output != old_output && flag) {
     Serial.printf("tx[%d]=%d\n", pin, val);
-    LOG("tx[%d]=%d\n", pin, val);
+    if(pin != 15) {
+      LOG("tx[%d]=%d\n", pin, val);
+    }
     udp.writeTo((const uint8_t *)&output, 2, remoteIP, remotePort);
   }
   xSemaphoreGive(tx_mutex);
